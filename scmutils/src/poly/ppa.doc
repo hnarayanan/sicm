@@ -1,0 +1,239 @@
+This is the Scheme process buffer.
+Type C-x C-e to evaluate the expression before point.
+Type C-c C-c to abort evaluation.
+Type C-h m for more information.
+
+Scheme Microcode Version 11.121
+MIT Scheme running under ATT (Vr4)
+
+Scheme saved on Thursday October 1, 1992 at 10:16:41 AM
+  Release 7.2.0 (alpha)
+  Microcode 11.121
+  Runtime 14.156
+  SF 4.23
+  Liar (MIPS) 4.93
+
+(load "/usr/local/lib/nscmutils/to-load")
+;Loading "/usr/local/lib/nscmutils/to-load.scm"
+;Loading "make.scm"
+;Loading "/usr/local/lib/mit-scheme/options/numint.com" -- done
+;Loading "mitsyn.com" -- done
+;Loading "utils.com" -- done
+;Loading "udefs.com" -- done
+;Loading "vects.com" -- done
+;Loading "mat.com" -- done
+;Loading "permute.com" -- done
+;Loading "tensors.com" -- done
+;Loading "base.com" -- done
+;Loading "package.com" -- done
+;Loading "functions.com" -- done
+;Loading "deriv.com" -- done
+;Loading "strutl.com" -- done
+;Loading "strarith.com" -- done
+;Loading "pseries.com" -- done
+;Loading "uspcf.com" -- done
+;Loading "spcf.com" -- done
+;Loading "rcf.com" -- done
+;Loading "operators.com" -- done
+;Loading "symb.com" -- done
+;Loading "generic.com" -- done
+;Loading "expr.com" -- done
+;Loading "simplify.com" -- done
+;Loading "env.com" -- done
+;Loading "elaborate.com" -- done
+;Loading "fundamental-streams.com" -- done
+;Loading "fundamental-series.com" -- done
+;Loading "litfuns.com" -- done
+;Loading "g-apply.com" -- done -- done
+
+Do you want to load the mechanics subsystem?
+{no/false yes/true} yes
+;Loading "make.scm"
+;Loading "make.scm"
+;Loading "../general/memoize.com" -- done
+;Loading "bigsimp.com" -- done
+;Loading "flatten.com" -- done
+;Loading "ntsimp.scm" -- done
+;Loading "osimp.scm" -- done -- done
+;Loading "statef.scm" -- done
+;Loading "lag.scm" -- done -- done
+;Loading "make.scm" -- done
+
+Do you want to load numerical integration subsystem?
+{no/false yes/true/all bulirsch-stoer qc gear} no
+;Loading "make.scm" -- done
+
+Do you want to load numerical linear algebra subsystem? 
+{no/false yes/true/all lu svd/least-squares full-pivot/fp gauss-jordan/gj} no -- done
+;Value: done
+
+
+
+(load "/usr/local/nscmutils/src/poly/ppa" numerical-environment)
+(load "/usr/local/nscmutils/src/poly/polyinterp" numerical-environment)
+(load "/usr/local/nscmutils/src/poly/nchebpoly" numerical-environment)
+(load "/usr/local/nscmutils/src/math/unimin" numerical-environment)
+
+(ge numerical-environment)
+
+(define foo (make-ppa sin 0 1/2 4 1e-6))
+
+(cpp foo)
+((0 . 1/2)
+ ppa-split
+ 1/4
+ (ppa-terminal *spcf*
+               1
+               (0 . .12467457493565486)
+               (1 . .9921974149942688)
+               (2 . -6.2256235228382195e-2)
+               (3 . -.1652371275139899))
+ ppa-terminal
+ *spcf*
+ 1
+ (0 . .3662720635889561)
+ (1 . .9305073853600081)
+ (2 . -.18289791451182325)
+ (3 . -.15496348323816278))
+;No value
+
+(ppa-value foo .3)
+;Value: .2955205841373176
+
+(sin .3)
+;Value: .2955202066613396
+
+
+
+
+(define foo (make-ppa sin 0 1/2 3 1e-6))
+;Value: foo
+
+(cpp foo)
+((0 . 1/2)
+ ppa-split
+ 1/4
+ (ppa-split
+  1/8
+  (ppa-split
+   1/16
+   (ppa-split
+    1/32
+    (ppa-terminal *spcf*
+                  1
+                  (0 . 1.5624364224883372e-2)
+                  (1 . .9998474185974578)
+                  (2 . -7.8120629087266025e-3))
+    ppa-terminal
+    *spcf*
+    1
+    (0 . .04685783574813424)
+    (1 . .9988710845608808)
+    (2 . -.02342856037932961))
+   ppa-split
+   3/32
+   (ppa-terminal *spcf*
+                 1
+                 (0 . .07804555138996731)
+                 (1 . .9969193698613452)
+                 (2 . -3.9022180258285744e-2))
+   ppa-terminal
+   *spcf*
+   1
+   (0 . .10915705687532237)
+   (1 . .9939941803151324)
+   (2 . -5.4577695640432466e-2))
+  ppa-split
+  3/16
+  (ppa-split
+   5/32
+   (ppa-terminal *spcf*
+                 1
+                 (0 . .1401619723470637)
+                 (1 . .9900983723201957)
+                 (2 . -.07007991682905867))
+   ppa-terminal
+   *spcf*
+   1
+   (0 . .17103002203139503)
+   (1 . .985235750066928)
+   (2 . -.08551370616805798))
+  ppa-split
+  7/32
+  (ppa-terminal *spcf*
+                1
+                (0 . .2017310638016388)
+                (1 . .9794110618234377)
+                (2 . -.1008639928240882))
+  ppa-terminal
+  *spcf*
+  1
+  (0 . .23223511861151147)
+  (1 . .9726299952989503)
+  (2 . -.11611578750307672))
+ ppa-split
+ 3/8
+ (ppa-split
+  5/16
+  (ppa-split
+   9/32
+   (ppa-terminal *spcf*
+                 1
+                 (0 . .2625123997691533)
+                 (1 . .9648991720898472)
+                 (2 . -.1312541970859229))
+   ppa-terminal
+   *spcf*
+   1
+   (0 . .29253334202332754)
+   (1 . .956226141213806)
+   (2 . -.1462644391727963))
+  ppa-split
+  11/32
+  (ppa-terminal *spcf*
+                1
+                (0 . .32226863043338666)
+                (1 . .9466193717382847)
+                (2 . -.16113185651738604))
+  ppa-terminal
+  *spcf*
+  1
+  (0 . .3516892289948141)
+  (1 . .936088244510648)
+  (2 . -.1758419313377999))
+ ppa-split
+ 7/16
+ (ppa-split
+  13/32
+  (ppa-terminal *spcf*
+                1
+                (0 . .3807664089923902)
+                (1 . .9246430429979231)
+                (2 . -.1903802994970647))
+  ppa-terminal
+  *spcf*
+  1
+  (0 . .40947177705329507)
+  (1 . .9122949432451524)
+  (2 . -.2047327645234418))
+ ppa-split
+ 15/32
+ (ppa-terminal *spcf*
+               1
+               (0 . .4377773028727551)
+               (1 . .8990560029621975)
+               (2 . -.21888531148056245))
+ ppa-terminal
+ *spcf*
+ 1
+ (0 . .4656553465851602)
+ (1 . .8849391497495773)
+ (2 . -.2328241206457733))
+;No value
+
+(ppa-value foo .3)
+;Value: .29552012035095687
+
+(sin .3)
+;Value: .2955202066613396
+

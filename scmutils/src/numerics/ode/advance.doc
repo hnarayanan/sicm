@@ -1,0 +1,129 @@
+@c This documents advance.scm as of 09/19/92
+@section Ordinary Differential Equation Integrators
+The advance-generator is used with 1-step adaptive integrators to to
+advance a state by a given increment in the independent variable, in the
+face of variable-stepsize advancers.
+
+It is used in two of the methods of making variable-step integrators
+(quality-control --- most useful for fourth-order
+Runge-Kutta integrator, and the  Bulirsch-Stoer integrator)
+The Gear  integrators for ``stiff'' systems of ode have their own
+advance-generators (see the documentation for gear).
+
+Advance-generator, when applied to an advancer (to be described),
+returns a procedure, called advance, that takes 6 arguments.  These
+are:
+
+ start-state: The initial state for the ODE system being integrated.
+
+ step-required: The increment in independent variable desired.  (The
+                difference between the final "time" and the initial
+                "time".)
+
+ h-suggested: A suggested starting step size.  If this is too big the
+              advancer will decrease it.  If it is too small the
+              advancer will increase it.  Picking the wrong size here 
+              may cost computer time to start up the integration
+              process.  Near a singularity, a bad choice may actually 
+              produce a numerical disaster.
+
+ max-h:       This is a limit on the maximum step the advancer will be
+              allowed to take.  This is useful for producing output
+              appropriate for graphing or tabulating, when using a
+              high-order integrator that may take huge steps to attain
+              the accuracy required.
+
+ continue:    This is a procedure which is called before each step is
+              taken.  It may be used to monitor, graph, or record the
+              progress of the integration.  
+
+              Continue is supplied with four arguments: 
+                 state:         The current state
+                 step-achieved: The current increment of the
+                                 independent variable
+                 h:             The next step to be tried
+                 cont:          The procedure of no arguments
+                                 (a "thunk"), to be called to let the
+                                 integration continue.
+
+ done:        This is a procedure which is called when the
+              step-required is achieved.
+
+              It is supplied with three arguments:
+                 state:         The final state
+                 step-achieved: The step of the independent
+                                 variable actually achieved at the 
+                                 final state.  This may differ slightly
+                                 from the step-required because of 
+                                 numerical noise.  This may be helpful
+                                 for continuing an integration.
+                 h-suggested:   The step appropriate for continuing
+                                 the integration from the final state.
+
+For example, to integrate x' = x from x(t0) = 1.0 to x(t0 + 1.0) using
+quality-controlled 4th-order Runge-Kutta integration (from qc.scm),
+with maximum local-truncation error allowed = 1.0e-4, printing out
+each step taken in the process, we may utter the following
+incantation:
+
+@example
+((advance-generator
+  ((quality-control rk4 4)		;integration method -- qc rk4
+    (lambda (v) v)			;system derivative for x' = x
+   1.0e-4))				;lte tolerated
+ #(1.0)					;initial state (at t = t0)
+ 1.0					;proceed to t = t0 + 1.0
+ 0.1					;first step no larger than .1
+ 0.5					;no step larger than .5
+ (lambda (state step h cont)            ;continue procedure
+   (pp state)                           ;  print state
+   (cont))                              ;  continue integrating
+ (lambda (final-state step sh)          ;done procedure
+   ;; assert ns = #(2.718...)           ;  we expect these results
+   ;; assert dt = 1.000...+-
+   (list final-state step sh)))
+
+;;; The following are the steps taken, and the final answer delivered.
+#(1.)
+#(1.1051709178357205)
+#(1.7085464740223417)
+#(2.665781643203912)
+;Value: (#(2.718274897237967) 1. .40211683037355606)
+@end example
+
+For another example, if you really want a fast, accurate answer to the
+same problem, you may use the Bulirsch-Stoer integrator.  You may have
+to supply the dimension of the system, and you need to transform the
+system derivative into the "lisptran" version, but look what you get
+after only four steps!
+
+@example
+((advance-generator 
+  (bulirsch-stoer-lisptran		;integrator : Bulirsch-Stoer
+   (system-derivative->lisptran-derivative
+     (lambda (v) v))			;system derivative for x' = x
+   1					;1 dimension
+   1.0e-15))				;lte tolerated
+ #(1.0)					;initial state (at t = t0)
+ 1.0					;proceed to t = t0 + 1.0
+ 0.1					;first step no larger than .1
+ 0.5					;no step larger than .5
+ (lambda (state step h cont)            ;continue procedure
+   (pp state)                           ;  print state
+   (cont))                              ;  continue integrating
+ (lambda (final-state step sh)          ;done procedure
+   ;; assert ns = #(2.718...)           ;  we expect these results
+   ;; assert dt = 1.000...+-
+   (list final-state step sh)))
+(0. #(1.))
+(.1 #(1.1051709180756475))
+(.25 #(1.2840254166877418))
+(.47500000000000003 #(1.6080141974857838))
+(.8125 #(2.25353478721321))
+;Value 5: (#(2.7182818284590455) 1. .28125)
+@end example
+
+
+Error Control
+
+

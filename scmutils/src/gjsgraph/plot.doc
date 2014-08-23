@@ -1,0 +1,517 @@
+		    The Scmutils graphing package
+
+
+     The source files covered in this documentation are
+       gjsgraph/plot
+       gjsgraph/graph
+
+
+The graphing package provides a primitive system for constructing a
+variety of presentations of numerical data.  It is not pretty, but we
+hope that it does the job.
+
+Plotting is organized around PLOTTERs.  A plotter is a message-
+acceptor that organizes the myriad of options and defaults needed to
+specify a plot.  A plotter is responsible for the creation and
+maintenance of a window (a Scheme graphics device) and its contents.
+A plotter may itself contain any number of traces, which are
+particular datasets, each with its own abscissa and ordinate
+specifications (such as logarithmic or linear, ranges, and axes and
+markings).  For example, a plotter may be given new data points to add
+to each trace it controls, and it may be asked to autoscale a
+particular trace based on the data currently stored in it.  Scmutils
+plotters have no commands for positioning, moving, or resizing
+windows.  Your window system is entirely in charge of that, and the
+Scheme program will not care about any such activity.  However, you
+can aways ask a plotter to redraw its traces and it will do so nicely
+in the currently available graphics device.
+
+To make a plotter, and to give it the name P, do:
+
+   (define p (make-plotter))
+
+You may have as many plotters outstanding as you like, and as the
+memory of the machine will support.  But the window for each plotter
+you make will be created on top of the previous one, unless you move
+one out of the way, say by mousing.
+
+The plotter you made can now take a number of commands.  Many commands
+have optional trace number arguments, labeled [n+] in the listing
+below.  If the trace number is left out, it is assumed to be 0 -- the
+number of the one trace that every plotter is born with.  There may be
+several trace number arguments, in which case the command is done to
+each trace so indicated.  If the trace-number argument is the symbol
+'ALL then the command is on all defined traces.  If the trace-number
+argument is the symbol 'DEFAULT then the defaults for future trace
+creation are being modified.  A command which gets information from 
+traces returns a list of values, one for each trace indicated.
+
+A plotter can be given the following commands:
+
+(p 'PLOT-TYPE [n+]) 
+     returns the plot type of each trace n.
+(p 'SET-TRACE-TYPE! <type> [n+])
+     sets the plot type of each trace n to be <type>.
+
+A plot type may be one of: X-Y or POLAR.  The default value is X-Y
+
+(p 'ABSCISSA-TYPE [n+]) 
+     returns the abscissa type of each trace n.
+(p 'SET-ABSCISSA-TYPE! <type> [n+])
+     sets the abscissa type of each trace n to be <type>.
+
+(p 'ORDINATE-TYPE [n+])
+     returns the ordinate type of each trace n.
+(p 'SET-ORDINATE-TYPE! <type> [n+])
+     sets the ordinate type of each trace n to be <type>.
+
+An axis type may be one of: LINEAR LN LOG10 LOG2 ANGLE.  If the axis
+type is ANGLE then the range of the coordinate is from -pi to pi, and
+the principal value of the data is plotted on that range.  The default
+axis type is LINEAR
+
+
+(p 'ABSCISSA-MIN [n+])
+     returns the low value of the abscissa range for each trace n.
+(p 'SET-ABSCISSA-MIN! <x> [n+])
+     sets the low value of the abscissa range for each trace n to <x>.
+
+(p 'ABSCISSA-MAX [n+])
+     returns the high value of the abscissa range for each trace n.
+(p 'SET-ABSCISSA-MAX! <x> [n+])
+     sets the high value of the abscissa range for each trace n to <x>.
+ 
+(p 'ORDINATE-MIN [n+])
+     returns the low value of the ordinate range for each trace n.
+(p 'SET-ORDINATE-MIN! <x> [n+])
+     sets the low value of the ordinate range for each trace n to <x>.
+
+(p 'ORDINATE-MAX [n+])
+     returns the high value of the ordinate range for each trace n.
+(p 'SET-ORDINATE-MAX! <x> [n+])
+     sets the high value of the ordinate range for each trace n to <x>.
+
+Plotted data is automatically scaled based on the values of these
+range variables.  This scaling only occurs when a plot is drawn (or
+redrawn).  It is rescaled if any of the range variables are changed.
+The default axis range is [0, 1].
+
+
+(p 'AUTOSCALE [n+])
+     sets the axis range variables for each trace n on the basis of
+the collected points already plotted in trace n.  The new ranges are
+returned in a list: (<xmin> <xmax> <ymin> <ymax>)
+
+
+(p 'CONNECT-THE-DOTS? [n+])
+     for each trace n, returns #t if the data points of that trace are
+     to be connected.  
+(p 'SET-CONNECT-THE-DOTS! <b> [n+])
+     sets the connect-the-dots status for each trace n to the boolean <b>.
+
+The default connect-the-dots status is #t.
+
+(p 'DRAWING-MODE [n+])
+     returns the drawing mode of each trace n.
+(p 'SET-DRAWING-MODE! <m> [n+])
+     sets the drawing-mode status of each trace n to the number <m>.
+
+The default drawing mode is the Scheme default: the foreground color
+
+
+(p 'LINE-STYLE [n+])
+     returns the line style of each trace n.
+(p 'SET-LINE-STYLE! <m> [n+])
+     sets the line-style status of each trace n to the number <m>.
+
+The default line style is solid.
+
+
+(p 'COLOR [n+])
+     returns the color of each trace n.
+(p 'SET-COLOR! <m> [n+])
+     sets the color status of each trace n to the string <m> (or #f,
+to specify the default color).
+
+Plotting with non-default colors is expensive in time.  The default
+color is the foreground color.  One can revert to the default color by
+setting the color to #f.
+
+
+The explanation of these plot variables is quoted from the MIT Scheme
+Language Manual below, under the heading: Characteristics of Graphics
+Output.
+
+
+(p 'PLOTTING-SYMBOL [n+])	      This feature is NOT IMPLEMENTED.
+     returns the plotting symbol of each trace n.
+(p 'SET-PLOTTING-SYMBOL! <m> [n+])     This feature is NOT IMPLEMENTED.
+     sets the plotting-symbol of each trace n to the descriptor <m>.
+
+
+			    Plotting data
+
+(p 'PLOT-A-POINT <x1> <x2> [n])
+     plots a point at coordinates <x1> <x2> in trace [n].  Plotting
+takes only one trace number.  If the plot type is X-Y then <x1> is the
+abscissa and <x2> is the ordinate.  If the plot is POLAR then <x1> is
+the magnitude and <x2> is the angle.  If the points are to be plotted
+as delivered (the default), the point will be plotted in the window in
+real time.  If the points are to be collected (also the default) the
+points will be collected into the trace, so they will be replotted if
+a REDRAW command is given.
+
+(p 'PLOT-POINTS <list-of-points> [n])
+     plots each point in the given list in trace n.  The points are
+represented as CAR/CDR pairs of numbers.
+
+
+(p 'FAST-POINT-PLOTTER [n])
+     returns a procedure that takes two arguments, <x1> and <x2>.
+Each time the procedure is called, it plots the point so specified in
+the trace n.
+
+		      Axis drawing and labeling
+
+The plotter gives us a crude ability to draw and label axes.  The
+commands associated with these features are as follows:
+
+(p 'ABSCISSA-MARKS-STYLE [n+])
+     returns the style of axis markings for each trace n, if any.
+(p 'SET-ABSCISSA-MARKS-STYLE! <s> [n+])
+     sets the style for axis markings for each trace n.
+
+(p 'ABSCISSA-MARKS-POSITION [n+])
+     returns the abscissa-marks-position for each trace n.
+(p 'SET-ABSCISSA-MARKS-POSITION! <x> [n+])
+     sets the abscissa-marks-position for each trace n to <x>
+
+(p 'ABSCISSA-MARKS [n+])
+     returns the map of abscissa markings for trace [n+].
+(p 'SET-ABSCISSA-MARKS! <l> [n+])
+     sets the map of abscissa markings for trace [n+] to the list <l>. 
+
+(p 'ORDINATE-MARKS-STYLE [n+])
+     returns the style of axis markings for each trace n, if any.
+(p 'SET-ORDINATE-MARKS-STYLE! <s> [n+])
+     sets the style for axis markings for each trace n.
+
+(p 'ORDINATE-MARKS-POSITION [n+])
+     returns the ordinate-marks-position for each trace n.
+(p 'SET-ORDINATE-MARKS-POSITION! <x> [n+])
+     sets the ordinate-marks-position for each trace n to <x>
+
+(p 'ORDINATE-MARKS [n+])
+     returns the map of ordinate markings for each trace n.
+(p 'SET-ORDINATE-MARKS! <l> [n+])
+     sets the map of ordinate markings for eac trace n to the list <l>. 
+
+The possible styles of axis markings are:
+     #f    -- no axis is drawn at all (default)
+     NONE  -- an unmarked axis is drawn
+     TICKS -- The axis is marked with ticks
+     GRID  -- Grid lines are drawn perpendicular to the axis
+
+The possible values of marks positions are:
+     LOW      -- at the left or bottom of the plot (default)
+     HIGH     -- at the right or top of the plot
+     a number -- at the given value of the orthogonal coordinate
+
+The map of axis markings is a list mark specifications.  A mark
+specification may be a single number -- specifying that a mark, such
+as a tick, should be placed at that point on the axis, or it may be a
+list.  If it is a list, the CAR specifies the position of the mark and
+the cadr is a string specifying the label for the mark.  For example,
+the default axis mark map is:
+
+  '((0.0 "0") 0.1 0.2 0.3 0.4 (0.5 "5") 0.6 0.7 0.8 0.9 (1.0 "10"))
+
+
+This specifies an axis that looks (approximately) like:
+
+    |-----|-----|-----|-----|-----|-----|-----|-----|-----|-----|
+     0                             5                             10
+
+We have NO IMPLEMENTATION of axes for POLAR plots.
+
+(p 'CLEAR-TRACES! [n+])
+     forgets all of the data collected on trace n.
+
+(p 'REDRAW-TRACES [n+])
+     redraws only the traces n of a multitrace plotter.
+
+
+(p 'POINTER-COORDINATES <continuation> [n])
+     in Scheme systems that can access a pointing device, e.g. a
+mouse, this waits for a button to be pressed on the mouse while it is
+pointing in the window controlled by the plotter p.  The two
+coordinates of the position of the mouse and the identity of the mouse
+button that is depressed (including bits for control and shift keys)
+are passed to the continuation, which must take three arguments.  The
+position of the mouse is reported in the coordinate system specified
+by trace n.
+
+
+		       Global Plotter Commands
+
+The following commands do not take an optional trace number argument.
+
+(p 'PLOT-POINTS-AS-DELIVERED?)
+     is #t if the plotter is set up to display points in real time. 
+     is #f if the plotter will only display points when redrawing.
+       (default is #t)
+(p 'SET-PLOT-POINTS-AS-DELIVERED! <b>)
+     sets the real-time status of the plotter to the given boolean.
+     
+(p 'COLLECT-POINTS?)
+     is #t if the plotter is set up to collect the points sent to it.
+     is #f if the plotter discards the points after use.
+       (default is #t ... Note that if this is #f and also the
+        PLOT-POINTS-AS-DELIVERED? is #f the plotter is a bit bucket.)
+(p 'SET-COLLECT-POINTS! <b>)
+     sets the collection status of the plotter to the given boolean.
+
+(p 'GET-TRACES)
+     returns the traces that have been created and collected.  This is
+     useful for further analysis, and for saving the state of the
+     plot.  The traces of a plotter obtained with this command can be
+     dumped into a file and restored with the following command.
+(p 'SET-TRACES! <traces>)
+     sets the traces of the plotter p to the given <traces>.
+
+(p 'REDRAW)
+     refreshs the window, or creates one if it is needed.
+
+(p 'CLEAR-GRAPHICS)
+     clears the graphics window.  Has no other effect.
+
+(p 'CLOSE-GRAPHICS)
+     dismisses the system graphics resources allocated to the plotter.
+They will be reallocated if the plotter needs them.
+
+		       Pretty useless commands
+			(for programmers only)
+
+(p 'SHOW-LABELS)
+     displays only the axis labelings
+
+(p 'HORIZONTAL-RESOLUTION)
+     number of points of the window in the horizontal direction
+     
+(p 'VERTICAL-RESOLUTION)
+     number of points of the window in the vertical direction
+
+(p 'GRAPHICS-DEVICE)
+     The Scheme graphics device allocated to the plotter
+
+(p 'NEW-TRACE)
+     creates a new trace, which becomes the new trace zero.
+     All previously created traces are then pushed to one higher
+     trace index.
+
+(p <n>)
+     Ensures that there are traces up to index n in this plotter
+
+		  Characteristics of Graphics Output
+
+   Two characteristics of graphics output are so useful that they are
+supported uniformly by all graphics devices: "drawing mode" and "line
+style".  A third characteristic, "color", is equally useful (if not
+more so), but implementation restrictions prohibit a uniform
+interface.
+
+   The "drawing mode", an exact integer in the range `0' to `15'
+inclusive, determines how the figure being drawn is combined with the
+background over which it is drawn to generate the final result.
+Initially the drawing mode is set to "source", so that the new output
+overwrites whatever appears in that place.  Useful alternative drawing
+modes can, for example, erase what was already there, or invert it.
+
+   Altogether 16 boolean operations are available for combining the
+source (what is being drawn) and the destination (what is being drawn
+over). The source and destination are combined by the device on a
+pixel-by-pixel basis as follows:
+
+     Mode    Meaning
+     ----    -------
+     0       ZERO [erase; use background color]
+     1       source AND destination
+     2       source AND (NOT destination)
+     3       source
+     4       (NOT source) AND destination
+     5       destination
+     6       source XOR destination
+     7       source OR destination
+     8       NOT (source OR destination)
+     9       NOT (source XOR destination)
+     10      NOT destination
+     11      source OR (NOT destination)
+     12      NOT source
+     13      (NOT source) OR destination
+     14      (NOT source) OR (NOT destination)
+     15      ONE [use foreground color]
+
+   The "line style", an exact integer in the range `0' to `7'
+inclusive, determines which parts of a line are drawn in the
+foreground color, and which in the background color.  The default line
+style, "solid", draws the entire line in the foreground color.
+Alternatively, the "dash" style alternates between foreground and
+background colors to generate a dashed line.  This capability is
+useful for plotting several things on the same graph.
+
+   Here is a table showing the name and approximate pattern of the
+different styles.  A `1' in the pattern represents a foreground pixel,
+while a `-' represents a background pixel.  Note that the precise
+output for each style will vary from device to device.  The only style
+that is guaranteed to be the same for every device is "solid".
+
+     Style   Name                    Pattern
+     -----   -------                 -------
+     0       solid                   1111111111111111
+     1       dash                    11111111--------
+     2       dot                     1-1-1-1-1-1-1-1-
+     3       dash dot                1111111111111-1-
+     4       dash dot dot            11111111111-1-1-
+     5       long dash               11111111111-----
+     6       center dash             111111111111-11-
+     7       center dash dash        111111111-11-11-
+
+To help understand the plotter, execute the following simple example:
+
+(define p (make-plotter))
+
+(p 'PLOT-A-POINT .1 .4)
+
+(p 'PLOT-A-POINT .2 .4)
+
+(p 'PLOT-A-POINT .3 .5)
+
+(p 'PLOT-A-POINT .1 .6)
+
+(p 'PLOT-A-POINT .1 .4)
+
+(p 'REDRAW)
+
+(p 'AUTOSCALE)
+
+(p 'REDRAW)
+
+(p 'PLOT-A-POINT .1 .4 1)
+
+(p 'PLOT-A-POINT .2 .4 1)
+
+(p 'PLOT-A-POINT .3 .5 1)
+
+(p 'PLOT-A-POINT .1 .6 1)
+
+(p 'PLOT-A-POINT .1 .4 1)
+
+(p 'SET-ABSCISSA-TYPE! 'log10)
+
+(p 'AUTOSCALE)
+
+(p 'REDRAW)
+
+(p 'SET-ABSCISSA-TYPE! 'linear)
+
+(p 'AUTOSCALE)
+
+(p 'REDRAW)
+
+(p 'CLOSE-GRAPHICS)
+
+(p 'REDRAW)
+
+			  Graphing functions
+
+
+(MAKE-PARAMETRIC-GRAPH plotter f tlo thi trace-specs #!optional n)
+
+The arguments are 
+
+     plotter
+
+     procedure 
+       The PROCEDURE implements the function desired.  The PROCEDURE
+       is expected to take a real-number argument and return a scheme 
+       vector of values.  The plotter will be directed to plot one 
+       component of this vector on the abscissa and one component of 
+       this vector on the ordinate for each trace.
+
+     tlo thi
+       The numbers [TLO, THI] specify the domain of the independent
+       variable.  The procedure will be given elements from this
+       domain to obtain the data for the desired graph.
+
+     trace-specs
+       Each element of this list is the specification of a trace to 
+       appear on the graph.  Each specification is a CAR/CDR pair.
+       The CAR of the pair specifies the vector index of the return
+       value of the PROCEDURE that will be mapped to the abscissa of
+       the trace and teh CDR of the pair specifies the vector index of
+       the return value of the PROCEDURE that will be mapped to the
+       ordinate of the trace.  If a trace spec is #f the corresponding 
+       trace is left unchanged by the graphing.  This may be useful 
+       for setting up comparison graphs.
+
+      n 
+       N is the number of points to be plotted.  The ith value of the 
+       independent variable will be T = TLO + I*(THI-TLO)/N.  The
+       default value of N is the horizontal resolution of the plotter.
+     
+Thus, for example, 
+
+(define p (make-plotter))
+
+(make-parametric-graph p
+		       (lambda (t) (vector t (cos t) (sin t)))
+		       0.0 7.0
+		       '((1 . 2)
+			 (0 . 1)))
+
+Will make a graph with two traces.  Trace number 0 will be a graph
+with the values of sin(t) on the ordinate and the corresponding values
+of cos(t) on the abscissa.  Trace number 1 will be a graph with the
+values of cos(t) on the ordinate and the corresponding values of t on
+the abscissa.  The independent parameter, t, will range from 0 to 7,
+so the trace 0 will have somewhat more than a circle. 
+
+Since the initial range of the traces is [0, 1] we will see 1/4 circle
+superimposed on a fraction of a cosine curve.
+
+If we then say
+
+(p 'AUTOSCALE 0)
+;Value: (-.999964658471342 1. -.9999880489592037 .9999911645788031)
+
+(p 'REDRAW)
+
+we will now have a circle superimposed on our fraction of the cosine
+curve.  Note that we now have a measure of the circle in the value
+returned by the autoscale command.
+
+Presumably we are now disgusted with our piece of cosine so we get rid
+of it by:
+
+(p 'CLEAR-TRACE 1)
+
+And now, perhaps, we would like to label our circle with axes and
+marks.  The default marks can be brought up, and the axes moved to the
+center of the circle by the following sequence:
+
+(p 'SET-ABSCISSA-MARKS-STYLE! 'TICKS)
+(p 'SET-ORDINATE-MARKS-STYLE! 'TICKS)
+(p 'SET-ABSCISSA-MARKS-POSITION! 0.0)
+(p 'SET-ORDINATE-MARKS-POSITION! 0.0)
+
+(p 'REDRAW)
+
+If we now want to indicate a point with the mouse and click with a
+mouse button, we get the following result:
+
+(p 'POINTER-COORDINATES list)
+;Value: (-.07767519355132335 -.07769187192825389 0)
+
+Note that the continuation LIST took three arguments and made a list
+of them.  Apparently I moused a point in the third quadrant with the
+left button (0).

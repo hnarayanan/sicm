@@ -1,0 +1,150 @@
+
+
+
+;;; Using the LU-Decomposition symbolically
+;;; load lu-symb.scm
+
+
+;;; works numerically, as expected
+
+((symbolic-lu-package 'solve-linear-system)
+ #(#(1 2 3 4) #(5 6 7 8) #(1 2 9 10) #(3 2 1 5))
+ #(1 2 3 4))
+;Value 39: #(19/30 -43/60 -7/15 4/5)
+
+;;; but also symbolically
+
+(pp (rcf:simplify
+     ((symbolic-lu-package 'solve-linear-system)
+      #(#(1 2 a 4) #(5 6 7 8) #(1 2 9 10) #(3 2 1 5))
+      #(b 2 3 4))))
+#((/ (+ -285/34 (* 57/34 a) (* 38/17 b)) (+ -81/17 a))
+  (/ (+ 573/68 (* -115/68 a) (* -71/34 b)) (+ -81/17 a))
+  (/ (+ -3/17 b) (+ -81/17 a))
+  (/ (+ -36/17 (* 8/17 a) (* -12/17 b)) (+ -81/17 a)))
+;No value
+
+(pp (rcf:simplify
+     (matrix:determinant
+      #(#(1 2 a 4) #(5 6 7 8) #(1 2 9 10) #(3 2 1 5)))))
+(+ -324 (* 68 a))
+;No value
+
+(pp (rcf:simplify
+     ((symbolic-lu-package 'determinant)
+      #(#(1 2 a 4) #(5 6 7 8) #(1 2 9 10) #(3 2 1 5)))))
+(+ -324 (* 68 a))
+;No value
+
+(pp (rcf:simplify
+     ((symbolic-lu-package 'determinant)
+      #(#(1 2 a 4) #(2 4 (* 2 a) 8) #(5 6 7 8) #(3 2 1 5)))))
+(*symb* 0)
+;No value
+
+(pp (rcf:simplify
+     ((symbolic-lu-package 'solve)
+      #(#(1 2 a 4) #(2 4 (* 2 a) 8) #(5 6 7 8) #(3 2 1 5))
+      #(b 2 3 4)
+      (lambda (ans) ans)
+      barf-on-zero-pivot)))
+;Singular matrix - zero pivot
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+;Quit!
+
+(define lua)
+;Value: lua
+
+((symbolic-lu-package 'decompose)
+ #(#(1 2 a 4) #(2 4 (* 2 a) 8) #(5 6 7 8) #(3 2 1 5))
+ (lambda (ans u v) (set! lua ans))
+ allow-zero-pivot)
+
+
+(pp lua)
+#(#(5 6 7 8)
+  #(2/5 8/5 (+ -14/5 (* 2 a)) 24/5)
+  #(3/5 -1 (- -16/5 (* -1 (+ -14/5 (* 2 a)))) 5)
+  #(1/5
+    1/2
+    (/
+     (- (+ -7/5 a) (* 1/2 (+ -14/5 (* 2 a))))
+     (- -16/5 (* -1 (+ -14/5 (* 2 a)))))
+    (-
+     (/
+      (* 5 (- (+ -7/5 a) (* 1/2 (+ -14/5 (* 2 a)))))
+      (- -16/5 (* -1 (+ -14/5 (* 2 a))))))))
+;No value
+
+(pp (rcf:simplify lua))
+#(#((*symb* 5) (*symb* 6) (*symb* 7) (*symb* 8))
+  #((*symb* 2/5) (*symb* 8/5) (+ -14/5 (* 2 a)) (*symb* 24/5))
+  #((*symb* 3/5) (*symb* -1) (+ -6 (* 2 a)) (*symb* 5))
+  #((*symb* 1/5) (*symb* 1/2) (*symb* 0) (*symb* 0)))
+;No value
+
+((symbolic-lu-package 'nullity) lua)
+;Value: 1
+
+((symbolic-lu-package 'rank) lua)
+;Value: 3
+
+(pp (rcf:simplify ((symbolic-lu-package 'null-vector) lua 0)))
+#((/ (+ 11/4 (* -7/4 a)) (+ -3 a))
+  (/ (+ 37/8 (* 1/8 a)) (+ -3 a))
+  (/ -5/2 (+ -3 a))
+  (*symb* 1))
+;No value
+
+(pp (rcf:simplify ((symbolic-lu-package 'null-vector) lua 1)))
+#((*symb* 0) (*symb* 0) (*symb* 0) (*symb* 0))
+;No value
+
+(pp (rcf:simplify
+     (matrix:matrix*vector 
+      #(#(1 2 a 4) #(2 4 (* 2 a) 8) #(5 6 7 8) #(3 2 1 5))
+      #((/ (+ 11/4 (* -7/4 a)) (+ -3 a))
+	(/ (+ 37/8 (* 1/8 a)) (+ -3 a))
+	(/ -5/2 (+ -3 a))
+	(*symb* 1)))))
+#((*symb* 0) (*symb* 0) (*symb* 0) (*symb* 0))
+;No value
+
+
+
+
+(define lua)
+;Value: lua
+
+((symbolic-lu-package 'decompose)
+ #(#(1 2 a 4) #(2 4 (* 2 a) 8) #(5 6 7 8) #(5 6 7 8))
+ (lambda (ans u v) (set! lua ans))
+ allow-zero-pivot)
+;No value
+
+(pp (rcf:simplify lua))
+#(#((*symb* 5) (*symb* 6) (*symb* 7) (*symb* 8))
+  #((*symb* 2/5) (*symb* 8/5) (+ -14/5 (* 2 a)) (*symb* 24/5))
+  #((*symb* 1/5) (*symb* 1/2) (*symb* 0) (*symb* 0))
+  #((*symb* 1) (*symb* 0) (*symb* 0) (*symb* 0)))
+;No value
+
+(pp (rcf:simplify ((symbolic-lu-package 'null-vector) lua 0)))
+#((*symb* 2) (*symb* -3) (*symb* 0) (*symb* 1))
+;No value
+
+(pp (rcf:simplify ((symbolic-lu-package 'null-vector) lua 1)))
+#((+ -7/2 (* 3/2 a)) (+ 7/4 (* -5/4 a)) (*symb* 1) (*symb* 0))
+;No value
+
+(pp (rcf:simplify
+     (* #(#(1 2 a 4) #(2 4 (* 2 a) 8) #(5 6 7 8) #(5 6 7 8))
+	(+ (vector:scalar*vector
+	    'p
+	    ((symbolic-lu-package 'null-vector) lua 0))
+	   (vector:scalar*vector
+	    'q
+	    ((symbolic-lu-package 'null-vector) lua 1))))))
+#((*symb* 0) (*symb* 0) (*symb* 0) (*symb* 0))
+;No value

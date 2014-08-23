@@ -1,0 +1,186 @@
+			Numerical Integration
+			    of Systems of
+		   Ordinary Differential Equations
+
+
+
+
+     The ordinary differential equations integrator interface provides
+a uniform interface for a variety of ODE integrators which require
+different formats of input and different specifications of errors.
+
+Currently the interface only gives a selection of two integration
+programs: Quality-Controlled Runge-Kutta 4 and Bulirsch-Stoer.  We
+have programs that implement other important systems, such as Gear's
+stiff solver other linear multistep algorithms.  We will add them to
+the interface as needed.
+
+The ODE interface is organized around ODE-INTEGRATORs.  An
+ODE-integrator is a message-acceptor that organizes the options and
+defaults that are necessary to specify an integration plan.
+
+To make an integrator, and to give it the name I, do:
+
+(define i (make-ode-integrator))
+
+
+You may have as many ODE integrators outstanding as you like.  An ODE
+integrator can be given the following commands:
+
+(i 'SYSTEM-DERIVATIVE)
+     returns the system derivative assigned to this integrator
+(i 'SET-SYSTEM-DERIVATIVE! <sder>)
+     sets the system derivative of the integrator to <sder>
+
+
+(i 'INITIAL-STATE)
+     returns the initial state assigned to this integrator
+(i 'SET-INITIAL-STATE! <state>)
+     sets the initial state of this integrator to the given <state>
+
+
+
+(i 'SYSTEM-INTEGRAL)
+     returns the procedure that computes the state at any value of the
+     independent variable.
+
+
+
+(i 'LOCAL-TRUNCATION-ERROR)
+     returns the local truncation error allowed in this integration
+(i 'SET-LOCAL-TRUNCATION-ERROR! <epsilon>)
+     sets the local truncation error allowed in this integration to
+     <epsilon>.  The default value is 1.0e-10.
+
+(i 'INTEGRATION-METHOD)
+     returns the integration method being used in this integration
+(i 'SET-INTEGRATION-METHOD! <name>)
+     sets the integration method to the given name.
+     The default integration method is QCRK4, which is pretty robust.
+     We also supply BULIRSCH-STOER, which has high performance for 
+       precision integrations of relatively smooth systems.
+     We will add GEAR, which is good for extremely stiff systems.
+
+
+(i 'STARTUP-SAFETY)
+     returns the proportion of the full step that we allow to be
+     considered for the first integration step.  This is a technical
+     detail.  Unless you are having trouble starting up, don't play
+     with this.
+(i 'SET-STARTUP-SAFETY! <delta>)
+     sets the startup safety to be <delta>.  
+     The default value is 0.1
+
+
+(i 'CURRENT-STATE)
+(i 'SET-CURRENT-STATE! <state>)
+
+(i 'CURRENT-DT)
+(i 'SET-CURRENT-DT! <dt>)
+
+		       Explanation and Example
+
+A system derivative is a procedure that takes a state vector and
+returns a vector of the same dimension that contains the derivative of
+that state vector.  By convention, the first element of every state
+vector is the independent variable, and so the first element of the
+result of every system derivative is 1.  Our system depends on this
+convention to keep track of the independent variable.
+
+For example, consider the system of ODEs that describes circular
+orbits:
+
+			    x'(t) = -y(t)
+			    y'(t) = +x(t)
+
+A suitable system derivative for this system is
+
+		  (define (dcircle state)
+		    (let ((t (vector-ref state 0))
+			  (x (vector-ref state 1))
+			  (y (vector-ref state 2)))
+		      (vector 1.0           ;dt/dt = 1
+			      (- y)
+			      x)))
+
+and we could say:
+
+		 (i 'SET-SYSTEM-DERIVATIVE! dcircle).
+
+Next, we must set up the initial conditions for the integration.  
+For example, if we want to consider
+
+			 x(0) = 1;  y(0) = 0
+
+we can say:
+ 
+	     (i 'set-initial-state! (vector 0.0 1.0 0.0))
+
+and then we can get the state for any value of the independent
+variable, by getting the system integral to compute it for us.
+
+		 (define circle (i 'SYSTEM-INTEGRAL))
+
+
+(circle 2.3)
+;Value: #(2.299999999999997 -.6662760212838276 .7457052121813551)
+
+(circle :+2pi)
+;Value: #(6.283185307179579 1.0000000000171316 -2.8591168784360595e-13)
+
+Note that after 2pi time we get back to almost the place we started.
+If we had used the Bulirsch-Stoer integrator instead of the default
+QCRK4 integrator, our answer would be almost perfect:
+
+(i 'set-integration-method! 'bulirsch-stoer)
+
+(i 'set-initial-state! (vector 0.0 1.0 0.0))
+
+(circle :+2pi)
+;Value: #(6.283185307179588 1.000000000000329 -4.399421842294976e-14)
+
+		 Programming with optional arguments
+
+     ODE integrators are so common and important that, to make the
+programming a bit easier we allow one to be set up slightly
+differently.  In particular, we can specify the important parameters
+as optional arguments to the maker.  The specification of the maker 
+is:
+
+        (make-ode-integrator #!optional
+			     system-derivative
+			     initial-state
+			     local-truncation-error
+			     integration-method)
+
+So, for example, we can determine the value of the circle integral
+above at 2pi as follows:
+
+(((make-ode-integrator dcircle
+		       (vector 0.0 1.0 0.0))
+  'system-integral)
+ :+2pi)
+;Value: #(6.283185307179586 1.0000000000171896 -2.860538195204044e-13)
+
+And if we want more bits, we can say:
+
+(((make-ode-integrator dcircle
+		       (vector 0.0 1.0 0.0)
+		       1e-14
+		       'bulirsch-stoer)
+  'system-integral)
+ :+2pi)
+;Value: #(6.283185307179552 .9999999999999846 1.1482973137170542e-14)
+
+
+
+One other way to use an ODE integrator is that the integrator object 
+can be used as an advancer.  So, for example,
+
+((make-ode-integrator dcircle)
+ (vector :+pi/2 0.0 1.0)
+ (* 3/2 :+pi))
+;Value: #(6.283185307179552 .9999999999999846 1.1482973137170542e-14)
+
+Takes a state from (vector :+pi/2 0.0 1.0) to the time
+(+ :+pi/2 (* 3/2 :+pi)) = :+2pi.

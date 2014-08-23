@@ -1,0 +1,17 @@
+.DS_Store
+*~
+\#*#
+
+*.bci
+*.bin
+*.c
+!/scmutils/src/c-utils/*.c
+!/scmutils/src/numerics/signals/cph-dsp/dubuf.c
+!/scmutils/src/numerics/signals/cph-dsp/filter-frame.c
+!/scmutils/src/numerics/signals/cph-dsp/kaiser-bp.c
+!/scmutils/src/numerics/signals/cph-dsp/lms.c
+!/scmutils/src/numerics/signals/cph-dsp/sbio.c
+!/scmutils/src/numerics/signals/cph-dsp/sbout.c
+*.ext
+*.o*
+*.so

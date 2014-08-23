@@ -1,0 +1,54 @@
+This is the Scheme process buffer.
+Type C-x C-e to evaluate the expression before point.
+Type C-c C-c to abort evaluation.
+Type C-h m for more information.
+
+Scheme Microcode Version 11.101
+MIT Scheme running under ATT (Vr4)
+
+Scheme saved on Tuesday November 5, 1991 at 4:09:07 PM
+  Release 7.2.0 (alpha)
+  Microcode 11.101
+  Runtime 14.141
+  SF 4.22
+  Liar (MIPS) 4.89
+
+(load "load")
+Loading "load.scm"
+Loading "old-path.scm" -- done
+Loading "prims.scm" -- done
+Loading "binio.scm" -- done
+Loading "cstruct.scm" -- done -- done
+;No value
+
+
+(define foofile (binary-file/open-input "footest.out"))
+;Value: foofile
+
+
+(define-c-structure foo
+  (char c)
+  (double d1)
+  (int i1)
+  (short s1)
+  (double d2)
+  (int i2)
+  (short s2))
+;No value
+
+
+(define foo1 (binary-file/read-foo foofile))
+;Value: foo1
+
+(pp foo1)
+#[foo 20]
+(c #\z)
+(d1 3.14159265358979)
+(i1 1234567890)
+(s1 2)
+(d2 2.718281828459045)
+(i2 -350287150)
+(s2 722)
+;No value
+
+
