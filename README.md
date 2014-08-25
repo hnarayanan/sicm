@@ -1,5 +1,4 @@
-# Working through the Structure and Interpretation of Classical
-  Mechanics
+# Working through the Structure and Interpretation of Classical Mechanics
 
 _Structure and Interpretation of Classical Mechanics_ is a book by
 Gerald Jay Sussman and Jack Wisdom that aims to explain classical
@@ -20,17 +19,14 @@ If you are interested in classical mechanics in general but find this
 book a little too deep to jump into as a first step (as it was for
 me), I'd like to suggest the following courses, in order:
 
-1. *To whet your appetite:* [Physics I: Classical Mechanics by Walter
-Lewin]
+1. To whet your appetite: [Physics I: Classical Mechanics by Walter Lewin]
 (http://ocw.mit.edu/courses/physics/8-01-physics-i-classical-mechanics-fall-1999/)
 
-2. *To get an intuitive feeling for non-Newtonian theory:* [Classical
-Mechanics by Leonard
-Susskind](http://theoreticalminimum.com/courses/classical-mechanics/2011/fall)
+2. To get an intuitive feeling for non-Newtonian theory:* [Classical
+Mechanics by Leonard Susskind] (http://theoreticalminimum.com/courses/classical-mechanics/2011/fall)
 
-3. *To get a better handle on programming (and Scheme):* [Structure
-and Interpretation of Computer
-Programs](http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-001-structure-and-interpretation-of-computer-programs-spring-2005/)
+3. To get a better handle on programming (and Scheme): [Structure and
+Interpretation of Computer Programs](http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-001-structure-and-interpretation-of-computer-programs-spring-2005/)
 
 ## Installation
 
