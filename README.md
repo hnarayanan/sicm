@@ -22,7 +22,7 @@ me), I'd like to suggest the following courses, in order:
 1. To whet your appetite: [Physics I: Classical Mechanics by Walter Lewin]
 (http://ocw.mit.edu/courses/physics/8-01-physics-i-classical-mechanics-fall-1999/)
 
-2. To get an intuitive feeling for non-Newtonian theory:* [Classical
+2. To get an intuitive feeling for abstract theory: [Classical
 Mechanics by Leonard Susskind] (http://theoreticalminimum.com/courses/classical-mechanics/2011/fall)
 
 3. To get a better handle on programming (and Scheme): [Structure and
