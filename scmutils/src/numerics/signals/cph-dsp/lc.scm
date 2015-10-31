@@ -2,7 +2,7 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Massachusetts
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
     Institute of Technology
 
 This file is part of MIT/GNU Scheme.
@@ -306,11 +306,12 @@ USA.
   (do ((y yl (+ y yd)))
       ((> y yh))
     (graphics-draw-text dev x y
-			(fluid-let ((flonum-unparser-cutoff '(RELATIVE 2)))
-			  (number->string
-			   (if (integer? y)
-			       (inexact->exact y)
-			       y))))))
+			(let-fluid flonum-unparser-cutoff '(RELATIVE 2)
+                          (lambda ()
+                            (number->string
+                             (if (integer? y)
+                                 (inexact->exact y)
+                                 y)))))))
 
 (define (draw-f-axis dev fl fh f->x xdmin yl yh)
   (graphics-draw-line dev (f->x fl) yl (f->x fh) yl)
@@ -325,12 +326,13 @@ USA.
       (graphics-draw-text device
 			  (f->x f)
 			  y
-			  (fluid-let ((flonum-unparser-cutoff '(RELATIVE 2)))
-			    (number->string
-			     (let ((x (/ f (expt 10 (exponent-of f)))))
-			       (if (integer? x)
-				   x
-				   (exact->inexact x)))))))))
+			  (let-fluid flonum-unparser-cutoff '(RELATIVE 2)
+                                     (lambda ()
+                                       (number->string
+                                        (let ((x (/ f (expt 10 (exponent-of f)))))
+                                          (if (integer? x)
+                                              x
+                                              (exact->inexact x))))))))))
 
 (define (map-over-f fl fh f->x xdmin procedure)
   (let ((fl
@@ -469,10 +471,11 @@ USA.
     (write-char #\tab)
     (call-with-values (lambda () (filter-shape (make-filter i) f0 6 60))
       (lambda (bw shape-factor)
-	(fluid-let ((flonum-unparser-cutoff '(RELATIVE 2)))
-	  (write bw)
-	  (write-char #\tab)
-	  (write shape-factor))))))
+	(let-fluid flonum-unparser-cutoff '(RELATIVE 2)
+          (lambda ()
+            (write bw)
+            (write-char #\tab)
+            (write shape-factor)))))))
 
 ;;;; Interesting Filters
 

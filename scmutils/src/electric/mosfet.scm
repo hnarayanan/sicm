@@ -2,7 +2,7 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Massachusetts
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
     Institute of Technology
 
 This file is part of MIT/GNU Scheme.
@@ -32,18 +32,20 @@ USA.
     (let* ((vov (- vGS VT))
 	   (zero-volts (zero-like vov))
 	   (zero-amperes
-	    (if (with-units? vov) (& 0 &ampere))))
+	    (if (with-units? vov) (& 0 &ampere) 0)))
       (cond ((<= vov zero-volts)	;Cutoff
 	     zero-amperes)
 	    ((<= zero-volts vov vDS)	;Saturation (Active)
-	     (if (= lamb 0)
-		 (* (/ K 2) (expt vov 2))
-		 (let ((vDSsat vov))
-		   (* (/ K 2) (expt vov 2)
-		      (+ 1 (* lamb vDSsat))))))
+             (let ((iD (* (/ K 2) (expt vov 2))))
+               (if (= lamb 0)
+                   iD
+                   (* iD (+ 1 (* lamb vDS))))))
 	    (else			;Ohmic (Switched On)
 	     ;;(<= 0 vDS vov)
-	     (* K (- vov (/ vDS 2)) vDS)))))
+             (let ((iD (* K (- vov (/ vDS 2)) vDS)))
+               (if (= lamb 0)
+                   iD
+                   (* iD (+ 1 (* lamb vDS)))))))))
   the-nfet)
 
 (define (p-channel_enhancement-mode_mosfet-current K VT #!optional lamb)
@@ -52,18 +54,20 @@ USA.
     (let* ((vov (- vSG VT))
 	   (zero-volts (zero-like vov))
 	   (zero-amperes
-	    (if (with-units? vov) (& 0 &ampere))))
+	    (if (with-units? vov) (& 0 &ampere) 0)))
       (cond ((<= vov zero-volts)	;Cutoff
 	     zero-amperes)
 	    ((<= zero-volts vov vSD)	;Saturation (Active)
-	     (if (= lamb 0)
-		 (* (/ K 2) (expt vov 2))
-		 (let ((vSDsat vov))
-		   (* (/ K 2) (expt vov 2)
-		      (+ 1 (* lamb vSDsat))))))
+             (let ((iD (* -1 (/ K 2) (expt vov 2))))
+               (if (= lamb 0)
+                   iD
+                   (* iD (+ 1 (* lamb vSD))))))
 	    (else			;Ohmic (Switched On)
 	     ;;(<= 0 vSD vov)
-	     (* K (- vov (/ vSD 2)) vSD)))))
+             (let ((iD (* -1 K (- vov (/ vSD 2)) vSD)))
+               (if (= lamb 0)
+                   iD
+                   (* iD (+ 1 (* lamb vSD)))))))))
   the-pfet)
 
 	   

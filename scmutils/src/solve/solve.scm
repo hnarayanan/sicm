@@ -2,7 +2,7 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Massachusetts
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
     Institute of Technology
 
 This file is part of MIT/GNU Scheme.
@@ -49,8 +49,10 @@ USA.
 
 ;;;; Simple catch-as-catch-can solver #42.  
 ;;;  By GJS, November 2003.  For use with SCMUTILS.
+;;;  Updated by GJS, 7 April 2008.
 ;;;  Updated by GJS, 8 April 2009, with suggestions by AXCH.
-;;;  Edited by GJS, 16 December 2009.
+;;;  Improved by GJS, 16 December 2009.
+;;;  Improved by GJS, 10 April 2014: if progress, hopeless->residual.
 
 (declare (usual-integrations))
 
@@ -157,11 +159,11 @@ The general strategy is:
 		      (lp (flush-tautologies
 			   (next-equations new-substitution
 			     (delete equation-used residual-eqs)))
-			  (cdr residual-vars)
+			  (append (cdr residual-vars) hopeless-vars)
 			  (cons new-substitution
 				(next-substitutions new-substitution
 						    substitutions))
-			  hopeless-vars
+			  '()
 			  #t))
 		    hopeless))))))))
 
@@ -234,6 +236,11 @@ The general strategy is:
 	   (var-in-product var expr succeed fail))
 	  ((sum? expr)
 	   (var-in-sum var expr succeed fail))
+	  ((quotient? expr)
+	   (isolatable? var
+			(car (operands expr))
+			succeed
+			fail))
 	  (else (fail)))))
 
 (define (positive-power? expr)
@@ -547,10 +554,10 @@ The general strategy is:
 	   (make-equation '(- 3 (- a b))  (list 'B)))
      '(a b c)))
 (()
- ()
- (((= c (/ (+ 9/2 (expt b 2) (* 9/2 b)) (+ 1 b))) (A B))
+ (b)
+ (((= c (/ (+ 9 (* 2 (expt b 2)) (* 9 b)) (+ 2 (* 2 b)))) (A B))
   ((= a (+ 3 b)) (B)))
- (b))
+ ())
 
 ;;; The following are permutations of the solution sequence
 
@@ -676,24 +683,24 @@ The general strategy is:
 	     siga4)
 	 (list 'K))
 	))
-
+
 (define unknowns
   '(siga0 siga1 siga2 siga3 siga4 sigd0 sigd1 sigd2 sigd3 sigd4 sa0 sa1 sd0 sd1))
 
 (define solution (solve-incremental equations unknowns))
-
+
 (pp solution)
 (()					; no residuals left
- (sa0 sa1 sd0 sd1)			; excess variables
+ (sa0 sa1 sd0 sd1 siga3 sigd3)		; excess variables
  (((= sigd4				; substitutions
-      (/ (+ (* eta nu sa0)
-	    (* eta nu sa1)
-	    (* 1/3 eta nu sr0)
-	    (* 1/3 eta nu sr1)
-	    (* eta sd0)
-	    (* 1/3 eta sr0)
-	    (* 1/3 eta sr1))
-	 (+ -1 (expt nu 2))))
+      (/ (+ (* 3 eta nu sa0)
+	    (* 3 eta nu sa1)
+	    (* eta nu sr0)
+	    (* eta nu sr1)
+	    (* 3 eta sd0)
+	    (* eta sr0)
+	    (* eta sr1))
+	 (+ -3 (* 3 (expt nu 2)))))
    (K A J E H D F B))
   ((= sigd2
       (/ (+ (* -2 eta nu sa0)
@@ -706,22 +713,30 @@ The general strategy is:
 	 (+ -1 (expt nu 2))))
    (H D F B))
   ((= sigd1
-      (/ (+ (* -2 eta nu sa1) (* -1 eta nu sd1) (* -1 (expt nu 2) sigd3) (* -1 eta sd1) sigd3)
+      (/ (+ (* -2 eta nu sa1)
+	    (* -1 eta nu sd1)
+	    (* -1 (expt nu 2) sigd3)
+	    (* -1 eta sd1)
+	    sigd3)
 	 (+ -1 (expt nu 2))))
    (H D F B))
   ((= sigd0
-      (/ (+ (* -1 eta nu sa0) (* -1 eta nu sd0) (* -1 eta nu sr0) (* -2 eta sd0) (* -1 eta sr0))
+      (/ (+ (* -1 eta nu sa0)
+	    (* -1 eta nu sd0)
+	    (* -1 eta nu sr0)
+	    (* -2 eta sd0)
+	    (* -1 eta sr0))
 	 (+ -1 (expt nu 2))))
    (J E F B))
   ((= siga4
-      (/ (+ (* eta nu sd0)
-	    (* 1/3 eta nu sr0)
-	    (* 1/3 eta nu sr1)
-	    (* eta sa0)
-	    (* eta sa1)
-	    (* 1/3 eta sr0)
-	    (* 1/3 eta sr1))
-	 (+ -1 (expt nu 2))))
+      (/ (+ (* 3 eta nu sd0)
+	    (* eta nu sr0)
+	    (* eta nu sr1)
+	    (* 3 eta sa0)
+	    (* 3 eta sa1)
+	    (* eta sr0)
+	    (* eta sr1))
+	 (+ -3 (* 3 (expt nu 2)))))
    (K A J E H D F B))
   ((= siga2
       (/ (+ (* eta nu sd1)
@@ -734,18 +749,27 @@ The general strategy is:
 	 (+ -1 (expt nu 2))))
    (H D F B))
   ((= siga1
-      (/ (+ (* -1 eta nu sd1) (* -1 (expt nu 2) siga3) (* -2 eta sa1) (* -1 eta sd1) siga3)
+      (/ (+ (* -1 eta nu sd1)
+	    (* -1 (expt nu 2) siga3)
+	    (* -2 eta sa1)
+	    (* -1 eta sd1)
+	    siga3)
 	 (+ -1 (expt nu 2))))
    (H D F B))
   ((= siga0
-      (/ (+ (* -2 eta nu sd0) (* -1 eta nu sr0) (* -1 eta sa0) (* -1 eta sd0) (* -1 eta sr0))
+      (/ (+ (* -2 eta nu sd0)
+	    (* -1 eta nu sr0)
+	    (* -1 eta sa0)
+	    (* -1 eta sd0)
+	    (* -1 eta sr0))
 	 (+ -1 (expt nu 2))))
    (J E F B)))
- (sigd3 siga3))				; variables considered hopeless (no way to isolate)
-
+ ())		 ; no variables considered hopeless (no way to isolate)
+
 ;;; Check
 (pp (map (lambda (equation)
-	     (apply-substitutions-to-equation equation (substitutions solution)))
+	     (apply-substitutions-to-equation equation
+					      (substitutions solution)))
 	   equations))
 ((0 (K H D J E F B A) ())
  (0 (H D F B) ())

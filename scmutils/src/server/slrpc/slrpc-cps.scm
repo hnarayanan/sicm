@@ -2,7 +2,7 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Massachusetts
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
     Institute of Technology
 
 This file is part of MIT/GNU Scheme.
@@ -31,7 +31,7 @@ USA.
 
 ;;; Author: Micah Brodsky
 ;;; Version: 0.2b, spring 2012
-
+;;; GJS fixed fluid references 22Nov2014
 
 ;;; Examples
 ;;;;;;;;;;;;
@@ -558,13 +558,12 @@ USA.
 (define (with-sane-unparser-config thunk)
   ; Fix unparser global state. Ugh!
   ; why isn't it port-associated??
-  (fluid-let
-	  ((*unparser-list-breadth-limit* #f)
-	   (*unparser-list-depth-limit* #f)
-	   (*unparser-string-length-limit* #f)
-	   (*unparse-abbreviate-quotations?* #t)
-	   (*parser-canonicalize-symbols?* #t))
-	(thunk)))
+  (let-fluids *unparser-list-breadth-limit* #f
+              *unparser-list-depth-limit* #f
+              *unparser-string-length-limit* #f
+              *unparse-abbreviate-quotations?* #t
+              *parser-canonicalize-symbols?* #t
+        thunk))
 
 (define (rpcsession-issue-async-command session command)
   ; Exposes errors directly for the client

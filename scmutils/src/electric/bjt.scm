@@ -2,7 +2,7 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Massachusetts
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
     Institute of Technology
 
 This file is part of MIT/GNU Scheme.
@@ -26,13 +26,21 @@ USA.
 
 ;;;; Nonlinear Hybrid-pi model -- from Getreu p.18
 
-(define (safe-exp x)
-  (if (differential? x)
-      (exp x)
-      (if (< x -745) 0 (exp x))))
+(load "/usr/local/scmutils/src/electric/junction-diode")
 
-(define ((diode-current I0 q/kT) v)
-  (* I0 (- (safe-exp (* q/kT v)) 1)))
+#|
+;;; Defined in /usr/local/scmutils/src/electric/junction-diode
+(define (safe-exp x)
+    (if (differential? x)
+	(exp x)
+	(cond ((< x -500) (exp -501))
+	      ((> x +500) (exp 501))
+	      (else (exp x)))))
+
+(define ((diode-current IS q/kT #!optional n) v)
+  (if (default-object? n) (set! n 1.0))	 ; 1<n<2 depending on junction.
+  (* IS (- (safe-exp (* (/ q/kT n) v)) 1)))
+|#
 
 ;;; my convention: 
 ;;;   npn: voltages measured from collector to base to emitter
@@ -40,6 +48,39 @@ USA.
 ;;;   pnp: voltages measured from emitter to base to collector
 ;;;        currents measured into emitter and out of base and collector.
 
+(define ((npn-currents IS q/kT beta-f beta-r #!optional VA)
+	 VBE VCE continue)
+  ;; continue = (lambda (IC IB IE) ...)
+  (let* ((VBC (- VBE VCE))
+	 (IS
+	  (if (default-object? VA)
+	      IS
+	      (/ IS (+ 1 (/ VBC VA))))))
+    (let ((ICC ((diode-current IS q/kT) VBE))
+	  (IEC ((diode-current IS q/kT) VBC)))
+      (let ((ICT (- ICC IEC)))
+	(let ((IC (- ICT (/ IEC beta-r)))
+	      (IB (+ (/ ICC beta-f) (/ IEC beta-r)))
+	      (IE (+ ICT (/ ICC beta-f))))
+	  (continue IC IB IE))))))
+
+(define ((pnp-currents IS q/kT beta-f beta-r #!optional VA)
+	 VEB VEC continue)
+  ;; continue = (lambda (IC IB IE) ...)
+  (let* ((VCB (- VEB VEC))
+	 (IS
+	  (if (default-object? VA)
+	      IS
+	      (/ IS (+ 1 (/ VCB VA))))))
+    (let ((ICC ((diode-current IS q/kT) VEB))
+	  (IEC ((diode-current IS q/kT) VCB)))
+      (let ((ICT (- ICC IEC)))
+	(let ((IC (- ICT (/ IEC beta-r)))
+	      (IB (+ (/ ICC beta-f) (/ IEC beta-r)))
+	      (IE (+ ICT (/ ICC beta-f))))
+	  (continue IC IB IE))))))
+
+#|
 (define ((npn-currents IS q/kT beta-f beta-r) VBE VCE continue)
   ;; continue = (lambda (IC IB IE) ...)
   (let ((ICC ((diode-current IS q/kT) VBE))
@@ -59,6 +100,7 @@ USA.
 	    (IB (+ (/ ICC beta-f) (/ IEC beta-r)))
 	    (IE (+ ICT (/ ICC beta-f))))
 	(continue IC IB IE)))))
+|#
 
 #|
 ((npn-currents 1e-12 38 100 5) .55 20 list)

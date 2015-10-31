@@ -2,7 +2,7 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Massachusetts
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
     Institute of Technology
 
 This file is part of MIT/GNU Scheme.
@@ -24,11 +24,12 @@ USA.
 
 |#
 
-
-(define (safe-exp x)
-  (if (differential? x)
-      (exp x)
-      (if (< x -745) 0 (exp x))))
+  (define (safe-exp x)
+    (if (differential? x)
+	(exp x)
+	(cond ((< x -500) (exp -501))
+	      ((> x +500) (exp 501))
+	      (else (exp x)))))
 
 (define ((diode-current IS q/kT #!optional n) v)
   (if (default-object? n) (set! n 1.0))	 ; 1<n<2 depending on junction.
@@ -49,7 +50,7 @@ USA.
   (if (default-object? n) (set! n 1.0))	 ; 1<n<2 depending on junction.
   (/ 1
      (* (/ q/kT n)
-	(* IS (exp (* (/ q/kT n) VD))))))
+	(* IS (safe-exp (* (/ q/kT n) VD))))))
 
 
 #|

@@ -24,7 +24,23 @@ USA.
 
 |#
 
-(with-case-preserved
-    (lambda ()
-      (cf-conditionally "bessel")
-      (cf-conditionally "elliptic")))
+;;;; Jeff Lang's model of a 2N7000
+;;;    using mosfet.scm
+
+(define win (frame 0 5 0 0.02))
+#| win |#
+
+(define 2N7000
+  (n-channel_enhancement-mode_mosfet-current 0.138 2.0 (/ 1.0 65)))
+#| 2N7000 |#
+
+(2N7000 2.3 3)
+#| 6.496615384615378e-3 |#
+
+(for-each (lambda (vGS)
+	    (plot-function win
+			   (lambda (vDS)
+			     (2N7000 vGS vDS))
+			   0. 5.
+			   .001))
+	  '(1.90 2.0 2.1 2.2 2.3 2.4 2.5))

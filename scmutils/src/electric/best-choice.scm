@@ -2,7 +2,7 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Massachusetts
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
     Institute of Technology
 
 This file is part of MIT/GNU Scheme.
@@ -55,7 +55,7 @@ USA.
 	    (filter acceptable-relative-error
 		    all-candidates))))
 
-
+#|
 (vd-choices (/ 17.5 50) 10 30 E12 0.05)
 (1296 30 224 5)
 #|
@@ -69,6 +69,7 @@ USA.
 (1296 8 224 1)
 #|
 ((.35294117647058826 33. 18.))
+|#
 |#
 
 (define (best-choice:voltage-divider goal-ratio min-impedance max-impedance resistor-choices tolerance)
@@ -126,7 +127,9 @@ USA.
 
 (define :E12x100 (map (lambda (x) (* 100 x)) :E12))
 
-(define E12 (append :E12 :E12x10 :E12x100))
+(define :E12x1000 (map (lambda (x) (* 1000 x)) :E12))
+
+(define E12 (append :E12 :E12x10 :E12x100 :E12x1000))
 #| E12 |#
 
 (best-choice:voltage-divider 1/5 10 30 E12 .1)

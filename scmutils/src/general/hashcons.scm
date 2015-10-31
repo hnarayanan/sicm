@@ -2,7 +2,7 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 Massachusetts
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
     Institute of Technology
 
 This file is part of MIT/GNU Scheme.
@@ -84,9 +84,10 @@ USA.
    modulus))
 
 (define the-cons-table
-  ((weak-hash-table/constructor pair-eqv-hash-mod
-				pair-eqv?
-				#t)))
+  ((hash-table/constructor pair-eqv-hash-mod
+			   pair-eqv?
+			   #t
+			   hash-table-entry-type:key-weak)))
 
 ;;; Given a list structure, to get a canonical copy equal to the given
 ;;; list structure.  Must canonicalize and share all substructure.
