@@ -13,5 +13,5 @@
 !/scmutils/src/numerics/signals/cph-dsp/sbio.c
 !/scmutils/src/numerics/signals/cph-dsp/sbout.c
 *.ext
-*.o*
+*.o
 *.so
