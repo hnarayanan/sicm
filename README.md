@@ -30,7 +30,15 @@ Interpretation of Computer Programs](http://ocw.mit.edu/courses/electrical-engin
 
 ## Installation
 
-TODO
+1. Install sudo port install mit-scheme (using Macports):
+
+   sudo port install mit-scheme
+
+2. Navigate to `sicm/scmutils/src` and run
+
+   mit-scheme
+   (load "compile")
+   (load "load")
 
 ## License
 
