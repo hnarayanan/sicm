@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -128,6 +128,9 @@ USA.
 (assign-operation 'cosh            (f:unary g:cosh)           function?)
 
 (assign-operation 'abs             (f:unary g:abs)            function?)
+
+(assign-operation 'determinant     (f:unary g:determinant)    function?)
+(assign-operation 'trace           (f:unary g:trace)          function?)
 
 ;;; Binary operations on functions are a bit weird.  A special predicate
 ;;; are needed to make the correct coercions possible:
@@ -146,6 +149,9 @@ USA.
 
 (assign-operation 'dot-product        (f:binary g:dot-product)   function? cofunction?)
 (assign-operation 'dot-product        (f:binary g:dot-product)   cofunction? function?)
+
+(assign-operation 'cross-product      (f:binary g:cross-product)   function? cofunction?)
+(assign-operation 'cross-product      (f:binary g:cross-product)   cofunction? function?)
 
 (assign-operation 'expt               (f:binary g:expt)          function? cofunction?)
 (assign-operation 'expt               (f:binary g:expt)          cofunction? function?)
@@ -171,6 +177,15 @@ USA.
 (assign-operation 'atan1              (f:unary g:atan)           function?)
 (assign-operation 'atan2              (f:binary g:atan)          function? cofunction?)
 (assign-operation 'atan2              (f:binary g:atan)          cofunction? function?)
+
+(assign-operation 'solve-linear-right      (f:binary g:solve-linear-right)  function? cofunction?)
+(assign-operation 'solve-linear-right      (f:binary g:solve-linear-right)  cofunction? function?)
+
+(assign-operation 'solve-linear-left      (f:binary g:solve-linear-left)  cofunction? function?)
+(assign-operation 'solve-linear-left      (f:binary g:solve-linear-left)  function? cofunction?)
+
+(assign-operation 'solve-linear      (f:binary g:solve-linear)  cofunction? function?)
+(assign-operation 'solve-linear      (f:binary g:solve-linear)  function? cofunction?)
 
 ;;; This only makes sense for linear functions...
 (define (((f:transpose f) g) a)

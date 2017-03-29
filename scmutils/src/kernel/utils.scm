@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -432,14 +432,19 @@ USA.
 
 (define concatenate-names (concatenate-names-maker "."))
 
-;;; Special property of MIT CScheme
+;;; Special property of MIT/GNU Scheme
+
+(define *birkholz* 
+  (environment-bound? system-global-environment 'set-fluid!))
 
 (define (print-depth #!optional newval)
   (if (default-object? newval) (set! newval #F))
   (if (or (not newval)
 	  (and (integer? newval)
 	       (positive? newval)))
-      (set-fluid! *unparser-list-depth-limit* newval)
+      (if *birkholz*
+	  (set-fluid! *unparser-list-depth-limit* newval)
+	  (set! *unparser-list-depth-limit* newval))
       (error "PRINT-DEPTH: Wrong type argument" newval)))
 
 (define (print-breadth #!optional newval)
@@ -447,7 +452,9 @@ USA.
   (if (or (not newval)
 	  (and (integer? newval)
 	       (positive? newval)))
-      (set-fluid! *unparser-list-breadth-limit* newval)
+      (if *birkholz*
+	  (set-fluid! *unparser-list-breadth-limit* newval)
+	  (set! *unparser-list-breadth-limit* newval))
       (error "PRINT-BREADTH: Wrong type argument" newval)))
 
 
@@ -469,12 +476,13 @@ USA.
     e))
 
 (define (cpp x #!optional port)
-  (pp x
-      (if (default-object? port)
-	  (current-output-port)
-	  port)
-      ;; as code
-      true))
+  (let ((port
+	 (if (default-object? port)
+	     (current-output-port)
+	     port)))
+    (display "#|\n" port)
+    (pp x port true)			; as code 
+    (display "|#\n" port)))
 
 ;;; Programs may leave notes here
 

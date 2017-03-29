@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -30,31 +30,13 @@ USA.
 
 ;;; Load this into scmutils-base-environment.
 
-
+#|
 ;;; We deal here in Gaussian ellipsoids -- see ellipses.scm
-
 (define make-ellipsoid list)
-(define center-point car)
-(define covariance-matrix cadr)
+(define ellipsoid:center-point car)
+(define ellipsoid:covariance-matrix cadr)
+|#
 
-(define-package-maker kalman (coefficient-package)
-  (let ((vector-package (vector-package-maker coefficient-package))
-	(matrix-package (matrix-package-maker coefficient-package))
-	(package-name `(kalman ,(coefficient-package 'package-name)))
-	)
-    (let ((v:dimension (vector-package 'dimension))
-	  (v:+ (vector-package '+))
-	  (v:- (vector-package '-))
-	  (dot-product (vector-package 'dot-product))
-
-	  (m:+ (matrix-package '+))
-	  (m:- (matrix-package '-))
-	  (m:* (matrix-package '*))
-	  (matrix*vector (matrix-package 'matrix*vector))
-	  (identity-matrix (matrix-package 'identity))
-	  (invert (matrix-package 'invert))
-	  (transpose (matrix-package 'transpose)))
-
 ;;; KALMAN-FILTER makes a Kalman filter for a dynamical system
 ;;;  characterized by the following functions of the state.
 
@@ -77,10 +59,10 @@ USA.
     (cons-stream estimate-ellipsoid
 		 (next-estimate
 		  (let ((measurement-ellipsoid (head data)))
-		    (let ((x (center-point estimate-ellipsoid))
-			  (Px (covariance-matrix estimate-ellipsoid))
-			  (y (center-point measurement-ellipsoid))
-			  (Py (covariance-matrix measurement-ellipsoid)))
+		    (let ((x (ellipsoid:center-point estimate-ellipsoid))
+			  (Px (ellipsoid:covariance-matrix estimate-ellipsoid))
+			  (y (ellipsoid:center-point measurement-ellipsoid))
+			  (Py (ellipsoid:covariance-matrix measurement-ellipsoid)))
 		      (kalman-filter-iteration x
 					       Px 
 					       (f x)
@@ -121,29 +103,28 @@ USA.
 ;;; Pk+1    : covariance matrix for the error in x_(k+1)
 	      
 (define (kalman-filter-iteration xk Pk xk+1- Phi M Qk yk+1 Rk+1)
-    (let* ((Pk+1- (m:+ (m:* Phi Pk (transpose Phi)) Qk))
-	   (e (v:- yk+1 (matrix*vector M xk+1-))) ;measured-predicted
-	   (B (m:* Pk+1- (transpose M)))
-	   (Y (m:+ (m:* M B) Rk+1))
-	   (K (m:* B (invert Y)))
-	   (xk+1 (v:+ xk+1- (matrix*vector K e)))
-	   (A (m:- (identity-matrix (v:dimension xk)) (m:* K M)))
-	   (Pk+1 (m:+ (m:* A Pk+1- (transpose A))
-		      (m:* K Rk+1 (transpose K)))))
-      (make-ellipsoid xk+1 Pk+1)))
-
-(make-arithmetic-package package-name
-  `(kalman-filter ,kalman-filter)
-  `(kalman-filter-iteration ,kalman-filter-iteration))
-)))
+  (let* ((Pk+1-
+          (matrix+matrix (matrix*matrix Phi
+                                        (matrix*matrix Pk
+                                                       (m:transpose Phi)))
+                         Qk))
+         (e (vector-vector yk+1 (matrix*vector M xk+1-))) ;measured-predicted
+         (B (matrix*matrix Pk+1- (m:transpose M)))
+         (Y (matrix+matrix (matrix*matrix M B) Rk+1))
+         (K (matrix*matrix B (m:invert Y)))
+         (xk+1 (vector+vector xk+1- (matrix*vector K e)))
+         (A (matrix-matrix (m:make-identity (v:dimension xk))
+                           (matrix*matrix K M)))
+         (Pk+1 (matrix+matrix (matrix*matrix A
+					     (matrix*matrix Pk+1-
+							    (m:transpose A)))
+                              (matrix*matrix K
+					     (matrix*matrix Rk+1
+							    (m:transpose K))))))
+    (make-ellipsoid xk+1 Pk+1)))
 
 #|
 ;;; For example,
-
-(define kalman-package (kalman-package-maker scheme-number-package))
-
-(define kalman-filter (kalman-package 'kalman-filter))
-
 
 ;;; Let's estimate the state in the discrete dynamical system 
 ;;;  x_(n+2) + a x_n = 0
@@ -167,8 +148,9 @@ USA.
 (define (df v)
   (let ((xn (vector-ref v 0))
 	(xn-1 (vector-ref v 1)))
-    (vector (vector 0     1  )
-	    (vector (- a) 0  ))))
+    (array->matrix
+     (vector (vector 0     1  )
+             (vector (- a) 0  )))))
 
 
 ;;; Let's measure x only, yielding a measurement matrix:
@@ -176,7 +158,7 @@ USA.
 (define (m v)
   (let ((xn (vector-ref v 0))
 	(xn-1 (vector-ref v 1)))
-    (vector (vector 1 0))))
+    (vector->row-matrix (vector 1 0))))
 
 ;;; We also need a system noise covariance matrix.
 ;;;   Assume a noisless evolution:
@@ -184,23 +166,27 @@ USA.
 (define (q v)
   (let ((xn (vector-ref v 0))
 	(xn-1 (vector-ref v 1)))
-    (vector (vector 0 0)
-	    (vector 0 0))))
+    (array->matrix
+     (vector (vector 0 0)
+             (vector 0 0)))))
 
 (define initial-estimate
   (make-ellipsoid (vector -1 1)	;at t=0
-		  (vector (vector .0001 0    )
-			  (vector 0     .0001))))
+		  (array->matrix
+                   (vector (vector .0001 0    )
+                           (vector 0     .0001)))))
 
 (define (me sigma)
   (let ((ss (square sigma)))
     (make-ellipsoid ((add-noise sigma) (vector 1))
-		    (vector (vector ss)))))
+		    (array->matrix
+                     (vector (vector ss))))))
 
 (define (mo sigma)
   (let ((ss (square sigma)))
     (make-ellipsoid ((add-noise sigma) (vector -1))
-		    (vector (vector ss)))))
+		    (array->matrix
+                     (vector (vector ss))))))
 
 
 (define (measurements sigma)
@@ -215,34 +201,31 @@ USA.
 		  initial-estimate
 		  (measurements .01))
 		 200)
-(#(-1 1) #(#(.0001 0) #(0 .0001)))
-(#(.99470729778394 1) #(#(.00005 0) #(0 .0001)))
-(#(.9920138466000679 -.99470729778394) #(#(.00005 0) #(0 .00005)))
-(#(-.994122797167975 -.9920138466000679)
- #(#(3.333333333333334e-5 0) #(0 .00005)))
-(#(-.9953900488991766 .994122797167975)
- #(#(3.333333333333334e-5 0) #(0 3.333333333333334e-5)))
-(#(.9958474964344258 .9953900488991766)
- #(#(2.5000000000000005e-5 0) #(0 3.333333333333334e-5)))
-  ... ... ... ... ... ... ... ... ... ... ... ... ... ... 
-(#(-.9983766235570967 1.0001158544214666)
- #(#(1.0101010101010112e-6 0) #(0 1.0101010101010112e-6)))
-(#(1.000080874500018 .9983766235570967)
- #(#(1.000000000000001e-6 0) #(0 1.0101010101010112e-6)))
-(#(.998203386325823 -1.000080874500018)
- #(#(1.000000000000001e-6 0) #(0 1.000000000000001e-6)))
-(#(-1.0001232792752752 -.998203386325823)
- #(#(9.90099009900991e-7 0) #(0 1.000000000000001e-6)))
+(#(-1 1) (*matrix* (2 . 2) #(#(.0001 0) #(0 .0001))))
+(#(1.0001730709821406 1)
+ (*matrix* (2 . 2) #(#(.00005 0) #(0 .0001))))
+(#(.9978705812444857 -1.0001730709821406)
+ (*matrix* (2 . 2) #(#(.00005 0) #(0 .00005))))
+(#(-.9979552528698752 -.9978705812444857)
+ (*matrix* (2 . 2) #(#(3.333333333333334e-5 0) #(0 .00005))))
+(#(-.9962294182434276 .9979552528698752)
+ (*matrix* (2 . 2) #(#(3.333333333333334e-5 0) #(0 3.333333333333334e-5))))
+(#(.9976416646167119 .9962294182434276)
+ (*matrix* (2 . 2) #(#(2.5000000000000005e-5 0) #(0 3.333333333333334e-5))))
+;;;  ... ... ... ... ... ... ... ... ... ... ... ... ... ... 
+(#(-1.0012035339339178 .9997116353192789)
+ (*matrix* (2 . 2) #(#(1.0101010101010112e-6 0) #(0 1.0101010101010112e-6))))
+(#(.9996432367258424 1.0012035339339178)
+ (*matrix* (2 . 2) #(#(1.000000000000001e-6 0) #(0 1.0101010101010112e-6))))
+(#(1.001340725565343 -.9996432367258424)
+ (*matrix* (2 . 2) #(#(1.000000000000001e-6 0) #(0 1.000000000000001e-6))))
+(#(-.9995953483921192 -1.001340725565343)
+ (*matrix* (2 . 2) #(#(9.90099009900991e-7 0) #(0 1.000000000000001e-6))))
 ;Value: ...
 |#
 
 #|
 ;;; For example,
-
-(define kalman-package (kalman-package-maker scheme-number-package))
-
-(define kalman-filter (kalman-package 'kalman-filter))
-
 
 ;;; Let's estimate the value of a in the discrete dynamical system 
 ;;;  x_(n+2) + a x_n = 0
@@ -266,9 +249,10 @@ USA.
   (let ((xn (vector-ref v 0))
 	(xn-1 (vector-ref v 1))
 	(a (vector-ref v 2)))
-    (vector (vector 0     1     0  )
-	    (vector (- a) 0     0  )
-	    (vector 0     0     1  ))))
+    (array->matrix
+     (vector (vector 0     1     0  )
+             (vector (- a) 0     0  )
+             (vector 0     0     1  )))))
 
 
 ;;; Let's measure x and a only, yielding a measurement matrix:
@@ -277,8 +261,9 @@ USA.
   (let ((xn (vector-ref v 0))
 	(xn-1 (vector-ref v 1))
 	(a (vector-ref v 2)))
-    (vector (vector 1 0 0)
-	    (vector 0 0 1))))
+    (array->matrix
+     (vector (vector 1 0 0)
+             (vector 0 0 1)))))
 
 ;;; We also need a system noise covariance matrix.
 ;;;   Assume a noisless evolution:
@@ -287,9 +272,10 @@ USA.
   (let ((xn (vector-ref v 0))
 	(xn-1 (vector-ref v 1))
 	(a (vector-ref v 2)))
-    (vector (vector 0 0 0)
-	    (vector 0 0 0)
-	    (vector 0 0 0))))
+    (array->matrix
+     (vector (vector 0 0 0)
+             (vector 0 0 0)
+             (vector 0 0 0)))))
 
 ;;; We will certainly have measurement noise and noise 
 ;;;  in our initial state estimate.
@@ -298,19 +284,22 @@ USA.
 #|
 (define initial-estimate
   (make-ellipsoid (vector -1 1 1)	;at t=0
-		  (vector (vector 1 0 0)
-			  (vector 0 1 0)
-			  (vector 0 0 1))))
+		  (array->matrix
+                   (vector (vector 1 0 0)
+                           (vector 0 1 0)
+                           (vector 0 0 1)))))
 
 (define me
   (make-ellipsoid (vector 1 1)
-		  (vector (vector 1 0)
-			  (vector 0 1))))
+		  (array->matrix
+                   (vector (vector 1 0)
+                           (vector 0 1)))))
 
 (define mo
   (make-ellipsoid (vector -1 1)
-		  (vector (vector 1 0)
-			  (vector 0 1))))
+                  (array->matrix
+                   (vector (vector 1 0)
+                           (vector 0 1)))))
 
 
 (define measurements
@@ -324,26 +313,26 @@ USA.
 		 ((kalman-filter f df m q) initial-estimate measurements)
 		 20)
 
-(#(-1 1 1) #(#(1 0 0) #(0 1 0) #(0 0 1)))
-(#(1 1 1) #(#(1/2 0 0) #(0 1 0) #(0 0 1/2)))
-(#(1 -1 1) #(#(1/2 0 0) #(0 1/2 0) #(0 0 1/3)))
-(#(-1 -1 1) #(#(1/3 0 0) #(0 1/2 0) #(0 0 1/4)))
-(#(-1 1 1) #(#(1/3 0 0) #(0 1/3 0) #(0 0 1/5)))
-(#(1 1 1) #(#(1/4 0 0) #(0 1/3 0) #(0 0 1/6)))
-(#(1 -1 1) #(#(1/4 0 0) #(0 1/4 0) #(0 0 1/7)))
-(#(-1 -1 1) #(#(1/5 0 0) #(0 1/4 0) #(0 0 1/8)))
-(#(-1 1 1) #(#(1/5 0 0) #(0 1/5 0) #(0 0 1/9)))
-(#(1 1 1) #(#(1/6 0 0) #(0 1/5 0) #(0 0 1/10)))
-(#(1 -1 1) #(#(1/6 0 0) #(0 1/6 0) #(0 0 1/11)))
-(#(-1 -1 1) #(#(1/7 0 0) #(0 1/6 0) #(0 0 1/12)))
-(#(-1 1 1) #(#(1/7 0 0) #(0 1/7 0) #(0 0 1/13)))
-(#(1 1 1) #(#(1/8 0 0) #(0 1/7 0) #(0 0 1/14)))
-(#(1 -1 1) #(#(1/8 0 0) #(0 1/8 0) #(0 0 1/15)))
-(#(-1 -1 1) #(#(1/9 0 0) #(0 1/8 0) #(0 0 1/16)))
-(#(-1 1 1) #(#(1/9 0 0) #(0 1/9 0) #(0 0 1/17)))
-(#(1 1 1) #(#(1/10 0 0) #(0 1/9 0) #(0 0 1/18)))
-(#(1 -1 1) #(#(1/10 0 0) #(0 1/10 0) #(0 0 1/19)))
-(#(-1 -1 1) #(#(1/11 0 0) #(0 1/10 0) #(0 0 1/20)))
+(#(-1 1 1) (*matrix* (3 . 3) #(#(1 0 0) #(0 1 0) #(0 0 1))))
+(#(1 1 1) (*matrix* (3 . 3) #(#(1/2 0 0) #(0 1 0) #(0 0 1/2))))
+(#(1 -1 1) (*matrix* (3 . 3) #(#(1/2 0 0) #(0 1/2 0) #(0 0 1/3))))
+(#(-1 -1 1) (*matrix* (3 . 3) #(#(1/3 0 0) #(0 1/2 0) #(0 0 1/4))))
+(#(-1 1 1) (*matrix* (3 . 3) #(#(1/3 0 0) #(0 1/3 0) #(0 0 1/5))))
+(#(1 1 1) (*matrix* (3 . 3) #(#(1/4 0 0) #(0 1/3 0) #(0 0 1/6))))
+(#(1 -1 1) (*matrix* (3 . 3) #(#(1/4 0 0) #(0 1/4 0) #(0 0 1/7))))
+(#(-1 -1 1) (*matrix* (3 . 3) #(#(1/5 0 0) #(0 1/4 0) #(0 0 1/8))))
+(#(-1 1 1) (*matrix* (3 . 3) #(#(1/5 0 0) #(0 1/5 0) #(0 0 1/9))))
+(#(1 1 1) (*matrix* (3 . 3) #(#(1/6 0 0) #(0 1/5 0) #(0 0 1/10))))
+(#(1 -1 1) (*matrix* (3 . 3) #(#(1/6 0 0) #(0 1/6 0) #(0 0 1/11))))
+(#(-1 -1 1) (*matrix* (3 . 3) #(#(1/7 0 0) #(0 1/6 0) #(0 0 1/12))))
+(#(-1 1 1) (*matrix* (3 . 3) #(#(1/7 0 0) #(0 1/7 0) #(0 0 1/13))))
+(#(1 1 1) (*matrix* (3 . 3) #(#(1/8 0 0) #(0 1/7 0) #(0 0 1/14))))
+(#(1 -1 1) (*matrix* (3 . 3) #(#(1/8 0 0) #(0 1/8 0) #(0 0 1/15))))
+(#(-1 -1 1) (*matrix* (3 . 3) #(#(1/9 0 0) #(0 1/8 0) #(0 0 1/16))))
+(#(-1 1 1) (*matrix* (3 . 3) #(#(1/9 0 0) #(0 1/9 0) #(0 0 1/17))))
+(#(1 1 1) (*matrix* (3 . 3) #(#(1/10 0 0) #(0 1/9 0) #(0 0 1/18))))
+(#(1 -1 1) (*matrix* (3 . 3) #(#(1/10 0 0) #(0 1/10 0) #(0 0 1/19))))
+(#(-1 -1 1) (*matrix* (3 . 3) #(#(1/11 0 0) #(0 1/10 0) #(0 0 1/20))))
 ;Value: ...
 |#
 
@@ -351,21 +340,24 @@ USA.
 
 (define initial-estimate
   (make-ellipsoid (vector -1 1 1)	;at t=0
-		  (vector (vector .0001 0     0)
-			  (vector 0     .0001 0)
-			  (vector 0     0     .0001))))
+		  (array->matrix
+                   (vector (vector .0001 0     0)
+                           (vector 0     .0001 0)
+                           (vector 0     0     .0001)))))
 
 (define (me sigma)
   (let ((ss (square sigma)))
     (make-ellipsoid ((add-noise sigma) (vector 1 1))
-		    (vector (vector ss 0)
-			    (vector 0  ss)))))
+		    (array->matrix
+                     (vector (vector ss 0)
+                             (vector 0  ss))))))
 
 (define (mo sigma)
   (let ((ss (square sigma)))
     (make-ellipsoid ((add-noise sigma) (vector -1 1))
-		    (vector (vector ss 0)
-			    (vector 0  ss)))))
+		    (array->matrix
+                     (vector (vector ss 0)
+                             (vector 0  ss))))))
 
 
 (define (measurements sigma)
@@ -381,27 +373,30 @@ USA.
 		  (measurements .01))
 		 200)
 (#(-1 1 1)
- #(#(.0001 0 0) #(0 .0001 0) #(0 0 .0001)))
-(#(.9999376413032195 1 1.0057446249431141)
- #(#(.00005 0 0) #(0 .0001 0) #(0 0 .00005)))
-(#(1.0057348593788396 -1.0056819080190087 1.0057677181183942)
- #(#(.00005 0 0) #(0 5.057611253009827e-5 0) #(0 0 3.333333333333334e-5)))
-(#(-1.0085448724810275 -1.0115356545495795 1.0054978189836263)
- #(#(3.358840368520521e-5 0 0)
-   #(0 5.057843514045408e-5 0)
-   #(0 0 2.5000000000000005e-5)))
-   ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... 
-(#(1.0288889309703222 1.0276658779334358 1.000074552045696)
- #(#(1.057257453641285e-6 0 0)
-   #(0 1.0669956062602948e-6 0)
-   #(0 0 5.050505050505055e-7)))
-(#(1.0274665272335184 -1.02896563674492 1.0000953641970813)
- #(#(1.0557310028460001e-6 0 0)
-   #(0 1.0574151009295225e-6 0)
-   #(0 0 5.025125628140708e-7)))
-(#(-1.0287870172396263 -1.027564510753916 1.0000437911325195)
- #(#(1.0463508292523073e-6 0 0)
-   #(0 1.055932370326007e-6 0)
-   #(0 0 5.000000000000004e-7)))
+ (*matrix* (3 . 3) #(#(.0001 0 0) #(0 .0001 0) #(0 0 .0001))))
+(#(.9986635451304994 1 .9968357594740724)
+ (*matrix* (3 . 3) #(#(.00005 0 0) #(0 .0001 0) #(0 0 .00005))))
+(#(.9988507865107299 -.9955035334692309 .9956849646744975)
+ (*matrix* (3 . 3) #(#(.00005 0 0) #(0 4.968407656831254e-5 0) #(0 0 3.333333333333334e-5))))
+(#(-.9970067461355772 -.9945407100820302 .997939515331579)
+ (*matrix* (3 . 3)
+	   #(#(3.319262656882399e-5 0 0)
+	     #(0 4.956942744394277e-5 0)
+	     #(0 0 2.5000000000000005e-5))))
+;;;  ... ... ... ... ... ... ... ... ... ... ... ... ... ... ... 
+(#(.9916284331995459 .9928265832875529 .9998398899467471)
+ (*matrix* (3 . 3)
+	   #(#(9.849290245637385e-7 0 0)
+	     #(0 9.945524796984946e-7 0)
+	     #(0 0 5.050505050505055e-7))))
+(#(.9928394763164069 -.9914696635182992 .9998185846174193)
+ (*matrix* (3 . 3)
+	   #(#(9.847585392275642e-7 0 0)
+	     #(0 9.846136557354734e-7 0)
+	     #(0 0 5.025125628140708e-7))))
+(#(-.9915306619947849 -.9926593599629698 .9998069686066482)
+ (*matrix* (3 . 3) #(#(9.750135392824288e-7 0 0)
+		     #(0 9.84401270943198e-7 0)
+		     #(0 0 5.000000000000004e-7))))
 ;Value: ...
 |#

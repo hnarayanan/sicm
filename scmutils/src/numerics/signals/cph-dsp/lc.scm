@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -302,16 +302,20 @@ USA.
 	((> y yh))
       (draw-tick y))))
 
+(define *birkholz* 
+  (environment-bound? system-global-environment 'set-fluid!))
+
 (define (label-y-axis dev yl yh yd x)
-  (do ((y yl (+ y yd)))
-      ((> y yh))
-    (graphics-draw-text dev x y
-			(let-fluid flonum-unparser-cutoff '(RELATIVE 2)
-                          (lambda ()
-                            (number->string
-                             (if (integer? y)
-                                 (inexact->exact y)
-                                 y)))))))
+  (do ((y yl (+ y yd))) ((> y yh))
+    (let ((thunk 
+	   (lambda ()
+	     (number->string (if (integer? y) (inexact->exact y) y)))))
+      (graphics-draw-text dev x y
+	 (if *birkholz*
+	     (let-fluid flonum-unparser-cutoff '(RELATIVE 2)
+			thunk)
+	     (fluid-let ((flonum-unparser-cutoff '(RELATIVE 2)))
+	       (thunk)))))))
 
 (define (draw-f-axis dev fl fh f->x xdmin yl yh)
   (graphics-draw-line dev (f->x fl) yl (f->x fh) yl)
@@ -323,16 +327,21 @@ USA.
 (define (label-f-axis device fl fh f->x xdmin y)
   (map-over-f fl fh f->x xdmin
     (lambda (f)
-      (graphics-draw-text device
-			  (f->x f)
-			  y
-			  (let-fluid flonum-unparser-cutoff '(RELATIVE 2)
-                                     (lambda ()
-                                       (number->string
-                                        (let ((x (/ f (expt 10 (exponent-of f)))))
-                                          (if (integer? x)
-                                              x
-                                              (exact->inexact x))))))))))
+      (let ((thunk
+	     (lambda ()
+	       (number->string
+		(let ((x (/ f (expt 10 (exponent-of f)))))
+		  (if (integer? x)
+		      x
+		      (exact->inexact x)))))))
+	(graphics-draw-text device
+			    (f->x f)
+			    y
+			    (if *birkholz*
+				(let-fluid flonum-unparser-cutoff '(RELATIVE 2)
+					   thunk)
+				(fluid-let ((flonum-unparser-cutoff '(RELATIVE 2)))
+				  (thunk))))))))
 
 (define (map-over-f fl fh f->x xdmin procedure)
   (let ((fl
@@ -470,12 +479,17 @@ USA.
     (write i)
     (write-char #\tab)
     (call-with-values (lambda () (filter-shape (make-filter i) f0 6 60))
+      (let ((thunk 
+	     (lambda ()
+	       (write bw)
+	       (write-char #\tab)
+	       (write shape-factor))))
       (lambda (bw shape-factor)
-	(let-fluid flonum-unparser-cutoff '(RELATIVE 2)
-          (lambda ()
-            (write bw)
-            (write-char #\tab)
-            (write shape-factor)))))))
+	(if *birkholz*
+	    (let-fluid flonum-unparser-cutoff '(RELATIVE 2)
+		       thunk)
+	    (fluid-let ((flonum-unparser-cutoff '(RELATIVE 2)))
+				  (thunk))))))))
 
 ;;;; Interesting Filters
 

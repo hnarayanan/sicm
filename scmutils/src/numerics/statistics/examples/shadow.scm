@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -194,7 +194,7 @@ USA.
   (define (make-covariance-matrix sigma)
      (if (number? sigma)
 	 (scalar*matrix (/ 1.0 (* 2.0 (square sigma)))
-			(identity-matrix (vector-length (car orbit))))
+			(m:make-identity (vector-length (car orbit))))
 	 (diagonal-matrix
 		 (map-vector (lambda (s) (/ 1.0 (* 2.0 (square s))))
 			     sigma))))
@@ -218,11 +218,11 @@ USA.
 	 (gaussian-random-tuples (vector-length (car orbit))
 				 (length orbit))))
     (let ((sgr (if (number? sigma)
-		   (map (scale-vector sigma) gr)
+		   (map (v:scale sigma) gr)
 		   (map (lambda (v)
 			  (map-2-vectors * sigma v))
 			gr))))
-      (map add-vectors orbit sgr))))
+      (map vector+vector orbit sgr))))
 
 (define (map-2-vectors f v1 v2)
   (generate-vector (vector-length v1)

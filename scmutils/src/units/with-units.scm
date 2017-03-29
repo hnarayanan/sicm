@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -313,6 +313,38 @@ USA.
 ;(assign-operation 'atan1               u:atan            with-units?)
 (assign-operation 'atan2               u:atan2            with-units? with-units?)
 
+
+(assign-operation 'solve-linear-right   u:/     with-units?              not-differential-or-compound?)
+(assign-operation 'solve-linear-right   u:/     not-differential-or-compound?  with-units?)
+
+(assign-operation 'solve-linear-right   u:/u    with-units?               units?)
+(assign-operation 'solve-linear-right   u:u/    units?                    with-units?)
+
+(assign-operation 'solve-linear-right   u:t/u    not-d-c-u?                units?)
+(assign-operation 'solve-linear-right   u:u/t    units?                    not-d-c-u?)
+
+
+(assign-operation 'solve-linear-left   (lambda (x y) (u:/ y x))     not-differential-or-compound?              with-units?)
+(assign-operation 'solve-linear-left   (lambda (x y) (u:/ y x))     with-units?           not-differential-or-compound?)
+
+(assign-operation 'solve-linear-left   (lambda (x y) (u:/u y x))    units?                 with-units?)
+(assign-operation 'solve-linear-left   (lambda (x y) (u:u/ y x))    with-units?            units?)
+
+(assign-operation 'solve-linear-left   (lambda (x y) (u:t/u y x))    units?                not-d-c-u?)
+(assign-operation 'solve-linear-left   (lambda (x y) (u:u/t y x))    not-d-c-u?            units?)
+
+
+(assign-operation 'solve-linear   (lambda (x y) (u:/ y x))     not-differential-or-compound?              with-units?)
+(assign-operation 'solve-linear   (lambda (x y) (u:/ y x))     with-units?           not-differential-or-compound?)
+
+(assign-operation 'solve-linear   (lambda (x y) (u:/u y x))    units?                 with-units?)
+(assign-operation 'solve-linear   (lambda (x y) (u:u/ y x))    with-units?            units?)
+
+(assign-operation 'solve-linear   (lambda (x y) (u:t/u y x))    units?                not-d-c-u?)
+(assign-operation 'solve-linear   (lambda (x y) (u:u/t y x))    not-d-c-u?            units?)
+
+
+
 #|
 (pe (definite-integral
       (lambda (r)
@@ -321,3 +353,5 @@ USA.
       (& 0 &meter) (& 1 &meter)))
 (& 9.824031599863007 &joule)
 |#
+
+

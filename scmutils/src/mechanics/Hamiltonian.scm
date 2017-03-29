@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -218,7 +218,7 @@ USA.
       (s:generate (s:length v) (s:opposite v)
 		  (lambda (i) :zero))
       :zero))
-|#
+
 
 ;;; A better definition of Legendre transform that works for
 ;;;   structured coordinates that have substructure
@@ -232,6 +232,36 @@ USA.
 	  ;; DM=0 for this code to be correct.
           (let ((v (solve-linear-left M (- w b))))
             (- (* w v) (F v))))))
+    G))
+|#
+
+;;; This ugly version tests for correctness of the result.
+
+(define (Legendre-transform-procedure F)
+  (let ((untested? #t)
+	(w-of-v (D F)))
+    (define (putative-G w)
+      (let ((z (compatible-zero w)))
+        (let ((M ((D w-of-v) z))
+              (b (w-of-v z)))
+	  (if (and untested? (zero? (simplify (determinant M))))
+	      (error "Legendre Transform Failure: determinant=0"
+		     F w))
+          (let ((v (solve-linear-left M (- w b))))
+	    (- (* w v) (F v))))))
+    (define (G w)
+      (if untested?
+	  (let ((thing (typical-object w)))
+	    (if (not (equal?
+		      (simplify
+		       ((compose w-of-v (D putative-G))
+			thing))
+		      (simplify thing)))
+		(error "Legendre Transform Failure: not quadratic"
+		       F w)
+		(set! untested? #f))
+	    'tested))
+      (putative-G w))
     G))
 
 (define Legendre-transform
@@ -733,6 +763,9 @@ USA.
 (define ((PB f g) s)
   (let ((J (linear-function->multiplier J-func ((D g) s))))
     (* ((D f) s) (* J ((D g) s)))))
+
+(define (H-harmonic m k)
+  (Lagrangian->Hamiltonian (L-harmonic m k)))
 
 (pe 
  (- ((Poisson-bracket (H-harmonic 'm 'k)

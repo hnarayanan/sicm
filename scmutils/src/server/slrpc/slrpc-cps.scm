@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -555,15 +555,25 @@ USA.
 
 (define *rpc-client-side-wallp* #f)
 
+(define *birkholz* 
+  (environment-bound? system-global-environment 'set-fluid!))
+
 (define (with-sane-unparser-config thunk)
-  ; Fix unparser global state. Ugh!
+  ; fix unparser global state ugh!
   ; why isn't it port-associated??
-  (let-fluids *unparser-list-breadth-limit* #f
-              *unparser-list-depth-limit* #f
-              *unparser-string-length-limit* #f
-              *unparse-abbreviate-quotations?* #t
-              *parser-canonicalize-symbols?* #t
-        thunk))
+  (if *birkholz*
+      (let-fluids *unparser-list-breadth-limit* #f
+		  *unparser-list-depth-limit* #f
+		  *unparser-string-length-limit* #f
+		  *unparse-abbreviate-quotations?* #t
+		  *parser-canonicalize-symbols?* #t
+		  thunk)
+      (fluid-let ((*unparser-list-breadth-limit* #f)
+		  (*unparser-list-depth-limit* #f)
+		  (*unparser-string-length-limit* #f)
+		  (*unparse-abbreviate-quotations?* #t)
+		  (*parser-canonicalize-symbols?* #t))
+	(thunk))))
 
 (define (rpcsession-issue-async-command session command)
   ; Exposes errors directly for the client

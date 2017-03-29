@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -141,12 +141,20 @@ omega0 period = 4 K the period of sn
 
 |#
 
+#|
+;;; Bug noticed on 25 Nov 2015!
 (define ((pendulum-oscillating-state-to-aa-state alpha beta) state)
   (let ((E ((Hpendulum alpha beta) state)))
     (let ((action ((pendulum-oscillating-action alpha beta E) state))
 	  (angle ((pendulum-oscillating-phase alpha beta) state)))
       (->H-state (state->t state) angle action))))
+|#
 
+(define ((pendulum-oscillating-state-to-aa-state alpha beta) state)
+  (let ((E ((Hpendulum alpha beta) state)))
+    (let ((action (pendulum-oscillating-action alpha beta E))
+	  (angle ((pendulum-oscillating-phase alpha beta) state)))
+      (->H-state (state->t state) angle action))))
 
 ;;;----------------------------------------------------------------
 ;;; ciculating case
@@ -250,9 +258,18 @@ program would not work without the principal-range call
 	  (* *action-to-E-bugger-factor* *machine-epsilon*)))
 |#
 
+#|
+;;; Bug noticed on 25 Nov 2015!
 (define ((pendulum-circulating-state-to-aa-state alpha beta) state)
   (let ((E ((Hpendulum alpha beta) state)))
     (let ((action ((pendulum-circulating-action alpha beta E) state))
+	  (angle ((pendulum-circulating-phase alpha beta) state)))
+      (->H-state (state->t state) angle action))))
+|#
+
+(define ((pendulum-circulating-state-to-aa-state alpha beta) state)
+  (let ((E ((Hpendulum alpha beta) state)))
+    (let ((action (pendulum-circulating-action alpha beta E))
 	  (angle ((pendulum-circulating-phase alpha beta) state)))
       (->H-state (state->t state) angle action))))
 

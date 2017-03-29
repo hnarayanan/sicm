@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -119,7 +119,8 @@ The general strategy is:
 (define (substitutions solution) (caddr solution))
 (define (hopeless-variables solution) (cadddr solution))
 
-(define (solve-incremental equations variables #!optional substitutions hopeless)
+(define (solve-incremental equations variables
+                           #!optional substitutions hopeless)
   (if (default-object? substitutions) (set! substitutions '()))
   (if (default-object? hopeless) (set! hopeless '()))
   (let lp ((residual-eqs
@@ -175,8 +176,7 @@ The general strategy is:
   (filter (lambda (eqn) 
 	    (let ((expr
 		   (equation-expression eqn)))
-	      (not (and (number? expr)
-			(= expr 0)))))
+	      (not (and (number? expr) (~0? expr)))))
 	  equations))
 
 (define (next-equations substitution equations)
@@ -319,6 +319,7 @@ The general strategy is:
        (list-union (equation-justifications equation)
 		   (substitution-justifications substitution)))
       equation))
+
 (define (substs->equations substs)
   (map subst->equation substs))
 
@@ -365,7 +366,7 @@ The general strategy is:
   (let* ((specs (standardize-equation expr '() '() #f))
 	 (pexpr (car specs))
 	 (vspecs (cadr specs)))
-    (if (and (number? pexpr) (not (= pexpr 0)))
+    (if (and (number? pexpr) (not (~0? pexpr)))
 	(begin (if *solve:contradiction-wallp*
 		   (write-line `(contradiction ,justs)))
 	       (list pexpr justs vspecs))
@@ -380,7 +381,7 @@ The general strategy is:
 
 (define (contradictory-eqn? eqn)
   (let ((expr (equation-expression eqn)))
-    (and (number? expr) (not (= expr 0)))))
+    (and (number? expr) (not (~0? expr)))))
 
 (define (eqn-contradiction? solution)
   (any contradictory-eqn? (residual-equations solution)))
@@ -629,60 +630,60 @@ The general strategy is:
 |#
 
 #|
-;;; A real problem, showing how dependencies keep track of contributions to solution
+;;; A real use. Note how dependencies keep track of contributions to solution
 (define equations
-  (list (make-equation
-	 '(+ (* -1/6 eta sr0) (* 1/12 eta sr1) (* -1/2 nu siga0) (* -1/4 nu siga1)
-	     (* -1/4 nu siga2) (* -1/2 nu siga3) (* -1 nu siga4) (* 1/2 sigd0)
-	     (* 1/4 sigd1) (* 1/4 sigd2) (* 1/2 sigd3) sigd4)
-	 (list 'A))
-	(make-equation
-	 '(+ (* -1/4 eta sd1) (* 1/8 eta sr1) (* -1/8 nu siga1) (* 1/8 nu siga2)
-	     (* 1/8 sigd1) (* -1/8 sigd2))
-	 (list 'B))
-	(make-equation
-	 '(+ (* -1/4 eta sd1) (* 1/8 eta sr1) (* -1/8 nu siga1) (* 1/8 nu siga2)
-	     (* 1/8 sigd1) (* -1/8 sigd2))
-	 (list 'C))
-	(make-equation
-	 '(+ (* -1/4 eta sr1) (* -1/4 nu siga1) (* -1/4 nu siga2) (* -1/2 nu siga3)
-	     (* 1/4 sigd1) (* 1/4 sigd2) (* 1/2 sigd3))
-	 (list 'D))
-	(make-equation
-	 '(+ (* -1 eta sd0) (* -1/2 eta sd1) (* -1/2 eta sr0) (* 1/4 eta sr1)
-	     (* -1/2 nu siga0) (* -1/4 nu siga1) (* 1/4 nu siga2) (* 1/2 sigd0)
-	     (* 1/4 sigd1) (* -1/4 sigd2))
-	 (list 'E))
-	(make-equation
-	 '(+ (* -1/8 eta sa0) (* 1/16 eta sd1) (* -1/16 eta sr1) (* 1/16 nu sigd1)
-	     (* -1/16 nu sigd2) (* -1/16 siga1) (* 1/16 siga2))
-	 (list 'F))
-	(make-equation
-	 '(+ (* 1/8 eta sa0) (* -1/16 eta sd1) (* 1/16 eta sr1) (* -1/16 nu sigd1)
-	     (* 1/16 nu sigd2) (* 1/16 siga1) (* -1/16 siga2))
-	 (list 'G))
-	(make-equation
-	 '(+ (* -3/8 eta sa0) (* -1/2 eta sa1) (* -1/16 eta sd1) (* -3/16 eta sr1)
-	     (* -1/16 nu sigd1) (* -3/16 nu sigd2) (* -1/4 nu sigd3) (* 1/16 siga1)
-	     (* 3/16 siga2) (* 1/4 siga3))
-	 (list 'H))
-	(make-equation
-	 '(+ (* 3/8 eta sa0) (* 1/2 eta sa1) (* 1/16 eta sd1) (* 3/16 eta sr1)
-	     (* 1/16 nu sigd1) (* 3/16 nu sigd2) (* 1/4 nu sigd3) (* -1/16 siga1)
-	     (* -3/16 siga2) (* -1/4 siga3))
-	 (list 'I))
-	(make-equation
-	 '(+ (* -1/4 eta sd0) (* -1/8 eta sd1) (* -1/4 eta sr0) (* 1/8 eta sr1)
-	     (* -1/4 nu sigd0) (* -1/8 nu sigd1) (* 1/8 nu sigd2) (* 1/4 siga0)
-	     (* 1/8 siga1) (* -1/8 siga2))
-	 (list 'J))
-	(make-equation
-	 '(+ (* -1/4 eta sd0) (* -1/8 eta sd1) (* 1/12 eta sr0) (* -1/24 eta sr1)
-	     (* -1/4 nu sigd0) (* -1/8 nu sigd1) (* -3/8 nu sigd2) (* -1/2 nu sigd3)
-	     (* -1 nu sigd4) (* 1/4 siga0) (* 1/8 siga1) (* 3/8 siga2) (* 1/2 siga3)
-	     siga4)
-	 (list 'K))
-	))
+  (list
+   (make-equation
+    '(+ (* -1/6 eta sr0) (* 1/12 eta sr1) (* -1/2 nu siga0) (* -1/4 nu siga1)
+        (* -1/4 nu siga2) (* -1/2 nu siga3) (* -1 nu siga4) (* 1/2 sigd0)
+        (* 1/4 sigd1) (* 1/4 sigd2) (* 1/2 sigd3) sigd4)
+    (list 'A))
+   (make-equation
+    '(+ (* -1/4 eta sd1) (* 1/8 eta sr1) (* -1/8 nu siga1) (* 1/8 nu siga2)
+        (* 1/8 sigd1) (* -1/8 sigd2))
+    (list 'B))
+   (make-equation
+    '(+ (* -1/4 eta sd1) (* 1/8 eta sr1) (* -1/8 nu siga1) (* 1/8 nu siga2)
+        (* 1/8 sigd1) (* -1/8 sigd2))
+    (list 'C))
+   (make-equation
+    '(+ (* -1/4 eta sr1) (* -1/4 nu siga1) (* -1/4 nu siga2) (* -1/2 nu siga3)
+        (* 1/4 sigd1) (* 1/4 sigd2) (* 1/2 sigd3))
+    (list 'D))
+   (make-equation
+    '(+ (* -1 eta sd0) (* -1/2 eta sd1) (* -1/2 eta sr0) (* 1/4 eta sr1)
+        (* -1/2 nu siga0) (* -1/4 nu siga1) (* 1/4 nu siga2) (* 1/2 sigd0)
+        (* 1/4 sigd1) (* -1/4 sigd2))
+    (list 'E))
+   (make-equation
+    '(+ (* -1/8 eta sa0) (* 1/16 eta sd1) (* -1/16 eta sr1) (* 1/16 nu sigd1)
+        (* -1/16 nu sigd2) (* -1/16 siga1) (* 1/16 siga2))
+    (list 'F))
+   (make-equation
+    '(+ (* 1/8 eta sa0) (* -1/16 eta sd1) (* 1/16 eta sr1) (* -1/16 nu sigd1)
+        (* 1/16 nu sigd2) (* 1/16 siga1) (* -1/16 siga2))
+    (list 'G))
+   (make-equation
+    '(+ (* -3/8 eta sa0) (* -1/2 eta sa1) (* -1/16 eta sd1) (* -3/16 eta sr1)
+        (* -1/16 nu sigd1) (* -3/16 nu sigd2) (* -1/4 nu sigd3) (* 1/16 siga1)
+        (* 3/16 siga2) (* 1/4 siga3))
+    (list 'H))
+   (make-equation
+    '(+ (* 3/8 eta sa0) (* 1/2 eta sa1) (* 1/16 eta sd1) (* 3/16 eta sr1)
+        (* 1/16 nu sigd1) (* 3/16 nu sigd2) (* 1/4 nu sigd3) (* -1/16 siga1)
+        (* -3/16 siga2) (* -1/4 siga3))
+    (list 'I))
+   (make-equation
+    '(+ (* -1/4 eta sd0) (* -1/8 eta sd1) (* -1/4 eta sr0) (* 1/8 eta sr1)
+        (* -1/4 nu sigd0) (* -1/8 nu sigd1) (* 1/8 nu sigd2) (* 1/4 siga0)
+        (* 1/8 siga1) (* -1/8 siga2))
+    (list 'J))
+   (make-equation
+    '(+ (* -1/4 eta sd0) (* -1/8 eta sd1) (* 1/12 eta sr0) (* -1/24 eta sr1)
+        (* -1/4 nu sigd0) (* -1/8 nu sigd1) (* -3/8 nu sigd2) (* -1/2 nu sigd3)
+        (* -1 nu sigd4) (* 1/4 siga0) (* 1/8 siga1) (* 3/8 siga2) (* 1/2 siga3)
+        siga4)
+    (list 'K)) ))
 
 (define unknowns
   '(siga0 siga1 siga2 siga3 siga4 sigd0 sigd1 sigd2 sigd3 sigd4 sa0 sa1 sd0 sd1))
@@ -738,6 +739,7 @@ The general strategy is:
 	    (* eta sr1))
 	 (+ -3 (* 3 (expt nu 2)))))
    (K A J E H D F B))
+
   ((= siga2
       (/ (+ (* eta nu sd1)
 	    (* -1 eta nu sr1)

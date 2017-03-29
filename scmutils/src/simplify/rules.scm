@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -251,14 +251,36 @@ USA.
      (expt (: x) (: (symb:* p/q m*q))) )
 
    ( (* (?? fs1)			; a rare, expensive luxury
+	(? x)
+	(?? fs2)
+	(expt (? x) (? y))
+	(?? fs3))
+     none
+     (* (:: fs1)
+	(:: fs2)
+	(expt (: x) (+ 1 (: y)))
+	(:: fs3)) )
+
+   ( (* (?? fs1)			; a rare, expensive luxury
+	(expt (? x) (? y))
+	(?? fs2)
+	(? x)
+	(?? fs3))
+     none
+     (* (:: fs1)
+	(expt (: x) (+ 1 (: y)))
+	(:: fs2)
+	(:: fs3)) )
+
+   ( (* (?? fs1)			; a rare, expensive luxury
 	(expt (? x) (? y1))
 	(?? fs2)
 	(expt (? x) (? y2))
 	(?? fs3))
      none
      (* (:: fs1)
-	(expt (: x) (+ (: y1) (: y2)))
 	(:: fs2)
+	(expt (: x) (+ (: y1) (: y2)))
 	(:: fs3)) )
    ))
 
@@ -1402,6 +1424,26 @@ USA.
 	    sincos->exp1
 	    trig->sincos)
    exp))
+
+(define clean-differentials
+  (rule-system
+   ( (make-differential-quantity
+      (list (?? lterms)
+	    (make-differential-term (? dx) 0)
+	    (?? rterms)))
+     none
+     (make-differential-quantity
+      (list (:: lterms)
+	    (:: rterms)) ))
+
+   ( (make-differential-quantity
+      (list (make-differential-term '() (? x))))
+     none
+     (: x))
+   
+   ( (make-differential-quantity (list)) none 0 )
+
+   ))
 
 (define (full-simplify exp)
   ((compose rcf:simplify

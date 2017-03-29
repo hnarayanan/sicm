@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -72,12 +72,23 @@ USA.
   (cdr diff))
 
 
-
+#|
 (define (differential->terms diff)
   (if (differential? diff)
       (differential-term-list diff)
       (list
        (make-differential-term '() diff))))
+|#
+
+(define (differential->terms diff)
+  (cond ((differential? diff)
+	 (filter (lambda (term)
+		   (not (g:zero? (differential-coefficient term))))
+		 (differential-term-list diff)))
+	((g:zero? diff) '())
+	(else (list (make-differential-term '() diff)))))
+
+
 
 (define (terms->differential terms)
   (cond ((null? terms) :zero)
@@ -359,6 +370,7 @@ USA.
 ;;; infinitesimal-part of each input to be consistent with respect to
 ;;; the differential tag, we do this as follows:
 
+#|
 (define (max-order-tag . args)
   (car (last-pair
 	(a-reduce union-differential-tags
@@ -366,6 +378,19 @@ USA.
 			 (differential-tags
 			  (car (last-pair (differential->terms arg)))))
 		       args)))))
+|#
+
+(define (max-order-tag . args)
+  (let ((u (a-reduce union-differential-tags
+		     (map (lambda (arg)
+			    (let ((terms (differential->terms arg)))
+			      (if (null? terms)
+				  '()
+				  (differential-tags (car (last-pair terms))))))
+			  args))))
+    (if (null? u)
+	'()
+	(car (last-pair u)))))
 
 (define (without-tag x keytag)
   (if (differential? x)
@@ -636,6 +661,15 @@ USA.
 (assign-operation '*               diff:*                not-compound? differential?)
 (assign-operation '/               diff:/                differential? not-compound?)
 (assign-operation '/               diff:/                not-compound? differential?)
+
+(assign-operation 'solve-linear-right     diff:/                   differential? not-compound?)
+(assign-operation 'solve-linear-right     diff:/                   not-compound? differential?)
+
+(assign-operation 'solve-linear-left      (lambda (x y) (diff:/ y x))   not-compound? differential?)
+(assign-operation 'solve-linear-left      (lambda (x y) (diff:/ y x))   differential? not-compound?)
+
+(assign-operation 'solve-linear           (lambda (x y) (diff:/ y x))   not-compound? differential?)
+(assign-operation 'solve-linear           (lambda (x y) (diff:/ y x))   differential? not-compound?)
 
 (assign-operation 'dot-product     diff:*                differential? not-compound?)
 

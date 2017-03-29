@@ -45,7 +45,7 @@ are:
                  cont:          The procedure of no arguments
                                  (a "thunk"), to be called to let the
                                  integration continue.
-
+
  done:        This is a procedure which is called when the
               step-required is achieved.
 
@@ -90,7 +90,7 @@ incantation:
 #(2.665781643203912)
 ;Value: (#(2.718274897237967) 1. .40211683037355606)
 @end example
-
+
 For another example, if you really want a fast, accurate answer to the
 same problem, you may use the Bulirsch-Stoer integrator.  You may have
 to supply the dimension of the system, and you need to transform the

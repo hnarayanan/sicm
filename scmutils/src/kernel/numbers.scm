@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -69,7 +69,7 @@ USA.
       (/ (sqrt (numerator x))
 	 (sqrt (denominator x)))
       (sqrt x)))
-
+
 (define n:exp exp)
 (define n:log log)
 
@@ -82,7 +82,7 @@ USA.
 (define n:asin asin)
 (define n:acos acos)
 (define n:atan atan)
-
+
 (define n:sinh sinh)
 (define n:cosh cosh)
 (define n:tanh tanh)
@@ -101,7 +101,7 @@ USA.
 (define n:- -)
 (define n:* *)
 (define n:/ /)
-
+
 #|
 (define (n:expt b e)			; (n:expt -1 1/3) => -1
   (if (and (ratnum? e)
@@ -183,8 +183,7 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 
 (assign-operation 'determinant      identity           number?)
 (assign-operation 'trace            identity           number?)
-
-
+
 (assign-operation '=          n:=            number? number?)
 (assign-operation '<          n:<            number? number?)
 (assign-operation '<=         n:<=           number? number?)
@@ -196,9 +195,11 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 (assign-operation '*          n:*            number? number?)
 (assign-operation '/          n:/            number? number?)
 
-(assign-operation 'solve-linear
-		  (lambda (x y) (n:/ y x))
-		  number? number?)
+(assign-operation 'solve-linear-right n:/    number? number?)
+
+(define (n:revdivide x y) (n:/ y x))
+(assign-operation 'solve-linear-left n:revdivide number? number?)
+(assign-operation 'solve-linear      n:revdivide number? number?)
 
 (assign-operation 'expt       n:expt         number? number?)
 (assign-operation 'gcd        n:gcd          number? number?)
@@ -215,11 +216,11 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 (assign-operation 'conjugate           n:conjugate        number?)
 
 (assign-operation 'atan1               n:atan             number?)
-(assign-operation 'atan2               n:atan             number? number?)
+(assign-operation 'atan2               n:atan     number? number?)
 
-;(assign-operation 'partial-derivative  n:deriv            number? any?)
+;(assign-operation 'partial-derivative  n:deriv      number? any?)
 
-(assign-operation 'apply               n:self             number? any?)
+(assign-operation 'apply               n:self        number? any?)
 
 ;;;; Abstract numbers generalize numerical quantities.
 
@@ -249,50 +250,102 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 (assign-operation 'type-predicate   n:type-predicate   abstract-number?)
 (assign-operation 'arity            n:arity            abstract-number?)
 
-(assign-operation 'inexact?   (has-property? 'inexact)         abstract-number?)
+(assign-operation 'inexact?  (has-property? 'inexact)  abstract-number?)
 
-(assign-operation 'zero-like        an:zero-like        abstract-number?)
-(assign-operation 'one-like         an:one-like         abstract-number?)
-(assign-operation 'identity-like    an:one-like         abstract-number?)
+(assign-operation 'zero-like        an:zero-like       abstract-number?)
+(assign-operation 'one-like         an:one-like        abstract-number?)
+(assign-operation 'identity-like    an:one-like        abstract-number?)
 
-(assign-operation 'negate  (make-numerical-combination 'negate)  abstract-number?)
-(assign-operation 'invert  (make-numerical-combination 'invert)  abstract-number?)
+(assign-operation 'negate
+		  (make-numerical-combination 'negate)
+		  abstract-number?)
+(assign-operation 'invert
+		  (make-numerical-combination 'invert)
+		  abstract-number?)
 
-(assign-operation 'sqrt    (make-numerical-combination 'sqrt)    abstract-number?)
-
-(assign-operation 'exp     (make-numerical-combination 'exp)     abstract-number?)
-(assign-operation 'log     (make-numerical-combination 'log)     abstract-number?)
-
-(assign-operation 'sin     (make-numerical-combination 'sin)     abstract-number?)
-(assign-operation 'cos     (make-numerical-combination 'cos)     abstract-number?)
-
-(assign-operation 'asin    (make-numerical-combination 'asin)    abstract-number?)
-(assign-operation 'acos    (make-numerical-combination 'acos)    abstract-number?)
-
-(assign-operation 'sinh    (make-numerical-combination 'sinh)    abstract-number?)
-(assign-operation 'cosh    (make-numerical-combination 'cosh)    abstract-number?)
-
-;(assign-operation 'derivative       n:deriv            abstract-number?)
+(assign-operation 'sqrt
+		  (make-numerical-combination 'sqrt)
+		  abstract-number?)
 
-(assign-operation '+   (make-numerical-combination '+)     abstract-number? abstract-number?)
-(assign-operation '+   (make-numerical-combination '+)     number?          abstract-number?)
-(assign-operation '+   (make-numerical-combination '+ 'r)  abstract-number? number?)
+(assign-operation 'exp
+		  (make-numerical-combination 'exp)
+		  abstract-number?)
+(assign-operation 'log
+		  (make-numerical-combination 'log)
+		  abstract-number?)
 
-(assign-operation '-   (make-numerical-combination '-)     abstract-number? abstract-number?)
-(assign-operation '-   (make-numerical-combination '-)     number?          abstract-number?)
-(assign-operation '-   (make-numerical-combination '-)     abstract-number? number?)
+(assign-operation 'sin
+		  (make-numerical-combination 'sin)
+		  abstract-number?)
+(assign-operation 'cos
+		  (make-numerical-combination 'cos)
+		  abstract-number?)
 
-(assign-operation '*   (make-numerical-combination '*)     abstract-number? abstract-number?)
-(assign-operation '*   (make-numerical-combination '*)     number?          abstract-number?)
-(assign-operation '*   (make-numerical-combination '* 'r)  abstract-number? number?)
+(assign-operation 'asin
+		  (make-numerical-combination 'asin)
+		  abstract-number?)
+(assign-operation 'acos
+		  (make-numerical-combination 'acos)
+		  abstract-number?)
 
-(assign-operation 'dot-product   (make-numerical-combination '*)     abstract-number? abstract-number?)
-(assign-operation 'dot-product   (make-numerical-combination '*)     number?          abstract-number?)
-(assign-operation 'dot-product   (make-numerical-combination '* 'r)  abstract-number? number?)
+(assign-operation 'sinh
+		  (make-numerical-combination 'sinh)
+		  abstract-number?)
+(assign-operation 'cosh
+		  (make-numerical-combination 'cosh)
+		  abstract-number?)
 
-(assign-operation '/   (make-numerical-combination '/)     abstract-number? abstract-number?)
-(assign-operation '/   (make-numerical-combination '/)     number?          abstract-number?)
-(assign-operation '/   (make-numerical-combination '/)     abstract-number? number?)
+;(assign-operation 'derivative n:deriv  abstract-number?)
+
+(assign-operation '+
+		  (make-numerical-combination '+)
+		  abstract-number? abstract-number?)
+(assign-operation '+
+		  (make-numerical-combination '+)
+		  number?          abstract-number?)
+(assign-operation '+
+		  (make-numerical-combination '+ 'r)
+		  abstract-number? number?)
+
+(assign-operation '-
+		  (make-numerical-combination '-)
+		  abstract-number? abstract-number?)
+(assign-operation '-
+		  (make-numerical-combination '-)
+		  number?          abstract-number?)
+(assign-operation '-
+		  (make-numerical-combination '-)
+		  abstract-number? number?)
+
+(assign-operation '*
+		  (make-numerical-combination '*)
+		  abstract-number? abstract-number?)
+(assign-operation '*
+		  (make-numerical-combination '*)
+		  number?          abstract-number?)
+(assign-operation '*
+		  (make-numerical-combination '* 'r)
+		  abstract-number? number?)
+
+(assign-operation 'dot-product
+		  (make-numerical-combination '*)
+		  abstract-number? abstract-number?)
+(assign-operation 'dot-product
+		  (make-numerical-combination '*)
+		  number?          abstract-number?)
+(assign-operation 'dot-product
+		  (make-numerical-combination '* 'r)
+		  abstract-number? number?)
+
+(assign-operation '/
+		  (make-numerical-combination '/)
+		  abstract-number? abstract-number?)
+(assign-operation '/
+		  (make-numerical-combination '/)
+		  number?          abstract-number?)
+(assign-operation '/
+		  (make-numerical-combination '/)
+		  abstract-number? number?)
 
 (assign-operation 'solve-linear
 		  (make-numerical-combination '/ 'r)
@@ -304,13 +357,48 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 		  (make-numerical-combination '/ 'r)
 		  abstract-number? number?)
 
-(assign-operation 'expt (make-numerical-combination 'expt) abstract-number? abstract-number?)
-(assign-operation 'expt (make-numerical-combination 'expt) number?          abstract-number?)
-(assign-operation 'expt (make-numerical-combination 'expt) abstract-number? number?)
+(assign-operation 'solve-linear-left
+		  (make-numerical-combination '/ 'r)
+		  abstract-number? abstract-number?)
+(assign-operation 'solve-linear-left
+		  (make-numerical-combination '/ 'r)
+		  number? abstract-number?)
+(assign-operation 'solve-linear-left
+		  (make-numerical-combination '/ 'r)
+		  abstract-number? number?)
 
-(assign-operation 'gcd (make-numerical-combination 'gcd)   abstract-number? abstract-number?)
-(assign-operation 'gcd (make-numerical-combination 'gcd)   number?          abstract-number?)
-(assign-operation 'gcd (make-numerical-combination 'gcd 'r) abstract-number? number?)
+(assign-operation 'solve-linear-right
+		  (make-numerical-combination '/)
+		  abstract-number? abstract-number?)
+(assign-operation 'solve-linear-right
+		  (make-numerical-combination '/)
+		  number? abstract-number?)
+(assign-operation 'solve-linear-right
+		  (make-numerical-combination '/)
+		  abstract-number? number?)
+
+(assign-operation 'determinant    identity    abstract-number?)
+(assign-operation 'trace          identity    abstract-number?)
+
+(assign-operation 'expt
+		  (make-numerical-combination 'expt)
+		  abstract-number? abstract-number?)
+(assign-operation 'expt
+		  (make-numerical-combination 'expt)
+		  number?          abstract-number?)
+(assign-operation 'expt
+		  (make-numerical-combination 'expt)
+		  abstract-number? number?)
+
+(assign-operation 'gcd
+		  (make-numerical-combination 'gcd)
+		  abstract-number? abstract-number?)
+(assign-operation 'gcd
+		  (make-numerical-combination 'gcd)
+		  number?          abstract-number?)
+(assign-operation 'gcd
+		  (make-numerical-combination 'gcd 'r)
+		  abstract-number? number?)
 
 (assign-operation 'make-rectangular
 		  (make-numerical-combination 'make-rectangular)
@@ -331,24 +419,40 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 (assign-operation 'make-polar
 		  (make-numerical-combination 'make-polar)
 		  abstract-number? number?)
+
+(assign-operation 'real-part
+		  (make-numerical-combination 'real-part)
+		  abstract-number?)
+(assign-operation 'imag-part
+		  (make-numerical-combination 'imag-part)
+		  abstract-number?)
+(assign-operation 'magnitude
+		  (make-numerical-combination 'magnitude)
+		  abstract-number?)
+(assign-operation 'angle
+		  (make-numerical-combination 'angle)
+		  abstract-number?)
 
-(assign-operation 'real-part (make-numerical-combination 'real-part) abstract-number?)
-(assign-operation 'imag-part (make-numerical-combination 'imag-part) abstract-number?)
-(assign-operation 'magnitude (make-numerical-combination 'magnitude) abstract-number?)
-(assign-operation 'angle     (make-numerical-combination 'angle)     abstract-number?)
+(assign-operation 'conjugate
+		  (make-numerical-combination 'conjugate)
+		  abstract-number?)
 
-(assign-operation 'conjugate (make-numerical-combination 'conjugate) abstract-number?)
+(assign-operation 'atan1
+		  (make-numerical-combination 'atan)
+		  abstract-number?)
+(assign-operation 'atan2
+		  (make-numerical-combination 'atan)
+		  abstract-number? abstract-number?)
+(assign-operation 'atan2
+		  (make-numerical-combination 'atan)
+		  number? abstract-number?)
+(assign-operation 'atan2
+		  (make-numerical-combination 'atan)
+		  abstract-number? number?)
 
-(assign-operation 'atan1     (make-numerical-combination 'atan)      abstract-number?)
-(assign-operation 'atan2     (make-numerical-combination 'atan)
-		                                    abstract-number? abstract-number?)
-(assign-operation 'atan2     (make-numerical-combination 'atan) number? abstract-number?)
-(assign-operation 'atan2     (make-numerical-combination 'atan) abstract-number? number?)
-
-;(assign-operation 'partial-derivative  n:deriv            abstract-number? any?)
-(assign-operation 'apply               n:self             abstract-number? any?)
-
-
+;(assign-operation 'partial-derivative  n:deriv  abstract-number? any?)
+(assign-operation 'apply               n:self    abstract-number? any?)
+
 ;;; Conservative tests...  These tests will return TRUE only if the
 ;;; default simplifier can prove that the answer is TRUE.  This is a
 ;;; bad idea to make generic, because it puts a simplification burden
@@ -374,9 +478,9 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
   (exact-one? (g:simplify x)))
 
 ;;; Sigh.
-;;; (assign-operation '=          an:=            abstract-number? abstract-number?)
-;;; (assign-operation 'zero?      an:zero?        abstract-number?)
-;;; (assign-operation 'one?       an:one?         abstract-number?)
+;;; (assign-operation '=   an:=  abstract-number? abstract-number?)
+;;; (assign-operation 'zero?  an:zero?        abstract-number?)
+;;; (assign-operation 'one?   an:one?         abstract-number?)
 
 ;;; Quick and dirty...
 
@@ -392,10 +496,10 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
   (let ((xx (expression-of x)))
     (and (number? xx) (one? xx))))
 
-(assign-operation '=          abn:=            abstract-number? abstract-number?)
-(assign-operation 'zero?      abn:zero?        abstract-number?)
-(assign-operation 'one?       abn:one?         abstract-number?)
-
+(assign-operation '=     abn:=      abstract-number? abstract-number?)
+(assign-operation 'zero? abn:zero?  abstract-number?)
+(assign-operation 'one?  abn:one?   abstract-number?)
+
 (define *known-reals* '())
 
 (define (known-real? z)
@@ -441,6 +545,7 @@ Indeed, (expt -1 (/ 1. 3)) will not be close to above!
 ;;; Temporary declaration
 
 (define (with-known-reals stuff thunk)
-  (fluid-let ((*known-reals* (list-union stuff *known-reals*)))
+  (fluid-let ((*known-reals*
+	       (list-union stuff *known-reals*)))
     (thunk)))
     

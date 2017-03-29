@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -30,8 +30,13 @@ USA.
 (declare (usual-integrations))
 
 ;;; f is a vector-valued function of a vector argument
-
 (define (multidimensional-root f initial-point initial-step min-step)
+  (multidimensional-root-internal f initial-point initial-step min-step
+                                  (lambda (x) x)
+                                  barf-on-zero-pivot))
+
+(define (multidimensional-root-internal f initial-point initial-step min-step
+                                        succeed fail)
   (let ((N (v:dimension initial-point)))
     (define (step xn xn-1)
       (let ((fn (f xn))
@@ -49,18 +54,21 @@ USA.
 					(vector-ref (vector-ref fps j) i))
 				     (- (vector-ref xn j)
 					(vector-ref xn-1 j)))))))
-	  (vector-vector xn (lu-solve-linear-system M fn)))))
+	  (lu-solve M fn
+                    (lambda (x)
+                      (vector-vector xn x))
+                    fail))))
     (define (good-root? xn xn-1)
       (let lp ((i 0) (diff 0))
 	(if (fix:= i N)
 	    (< diff min-step)
 	    (lp (fix:+ i 1)
 		(max diff
-		     (abs (- (vector-ref xn i)
-			     (vector-ref xn-1 i))))))))
+		     (magnitude (- (vector-ref xn i)
+                                   (vector-ref xn-1 i))))))))
     (define (try xn xn-1)
       (if (good-root? xn xn-1)
-	  xn
+	  (succeed xn)
 	  (try (step xn xn-1) xn)))
     (try initial-point
 	 (if (vector? initial-step)
@@ -96,8 +104,8 @@ USA.
  (lambda (v)
    (let ((x (vector-ref v 0)) (y (vector-ref v 1)))
      (vector (+ x (- y) -1) (square (+ x y -3)))))
- (vector 1.5 1.5)
+ (vector 1.5 1.4)
  .01
  1e-15)
-;Value: #(1.999999999999999 .9999999999999988)
+;Value: #(1.9999999999999996 .9999999999999997)
 |#

@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -126,6 +126,8 @@ USA.
 
 (define *bisect-wallp* #f)
 
+(define *bisect-error?* #f)
+
 (define (bisect f x0 x1 eps #!optional n-break)
   (let ((n-break (if (default-object? n-break) *bisect-break* n-break)))
     (let loop ((x0 x0) (fx0 (f x0)) (x1 x1) (fx1 (f x1)) (iter 0))
@@ -135,7 +137,9 @@ USA.
 	  (if (= fx1 0.0)
 	      x1
 	      (if (> (* fx1 fx0) 0.0)
-		  (error "root not bounded")
+                  (if *bisect-error?*
+                      (error "root not bounded")
+                      #f)
 		  (let ((xm (if (< iter n-break) 
 				(/ (+ x0 x1) 2.)
 				(/ (- (* fx1 x0) (* fx0 x1)) (- fx1 fx0)))))

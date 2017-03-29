@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -52,59 +52,37 @@ USA.
 
 ;;; JOINT-DISTRIBUTION returns a new ellipsoid.
 
-(define-package-maker distributions (coefficient-package #!optional manifold)
-  (let ((+ (coefficient-package '+))
-	(- (coefficient-package '-))
-	(* (coefficient-package '*))
-	(/ (coefficient-package '/))
-	(sqrt (coefficient-package 'sqrt))
-	(exp (coefficient-package 'exp))
-	(expt (coefficient-package 'expt))
-
-	(vector-package (vector-package-maker coefficient-package))
-	(matrix-package (matrix-package-maker coefficient-package))
-	(package-name `(ellipsoids ,(coefficient-package 'package-name)))
-	)
-    (let ((pdv
-	   (if (default-object? manifold)
-	       (vector-package '-)
-	       (manifold 'difference-vector)))
-
-	  (v:+ (vector-package '+))
-	  (dot-product (vector-package 'dot-product))
-
-	  (m:+ (matrix-package '+))
-	  (m:* (matrix-package '*))
-	  (matrix*vector (matrix-package 'matrix*vector))
-	  (solve-linear-system (matrix-package 'solve-linear-system))
-	  (determinant (matrix-package 'determinant)))
-	
 (define make-ellipsoid list)
-(define center-point car)
-(define covariance-matrix cadr)
+(define ellipsoid:center-point car)
+(define ellipsoid:covariance-matrix cadr)
 
-(define (joint-distribution . given-ellipsoids)		;must be one or more
+(define pdv vector-vector)		;for flat manifold
+
+(define (joint-distribution . given-ellipsoids) ;must be one or more
   (let ((ellipsoids
 	 (let ((e1 (car given-ellipsoids))
 	       (es (cdr given-ellipsoids)))
-	   (let ((ce1 (center-point e1)))
+	   (let ((ce1 (ellipsoid:center-point e1)))
 	     (cons e1
 		   (map (lambda (e)
-			  (make-ellipsoid (v:+ ce1 (pdv (center-point e) ce1))
-					  (covariance-matrix e)))
+			  (make-ellipsoid
+                           (vector+vector ce1
+                                          (pdv (ellipsoid:center-point e)
+                                                         ce1))
+                           (ellipsoid:covariance-matrix e)))
 			es))))))
-    (let ((new-covariance-matrix
-	   (a-reduce m:+ (map covariance-matrix ellipsoids)))
+    (let ((new-ellipsoid:covariance-matrix
+	   (a-reduce matrix+matrix (map ellipsoid:covariance-matrix ellipsoids)))
 	  (foob
 	   (map (lambda (ellipsoid)
-		  (matrix*vector (covariance-matrix ellipsoid)
-				 (center-point ellipsoid)))
+		  (matrix*vector (ellipsoid:covariance-matrix ellipsoid)
+				 (ellipsoid:center-point ellipsoid)))
 		ellipsoids)))
       (let ((new-center
-	     (solve-linear-system new-covariance-matrix
-				  (a-reduce v:+ foob))))
+	     (m:solve-linear new-ellipsoid:covariance-matrix
+                             (a-reduce vector+vector foob))))
 	;; This matrix is real, positive, and symmetric.
-	(make-ellipsoid new-center new-covariance-matrix)))))
+	(make-ellipsoid new-center new-ellipsoid:covariance-matrix)))))
 
 
 ;;; The following is a probability-density function... Its integral
@@ -113,13 +91,13 @@ USA.
 
 (define (probability-density ellipsoid)
   (let ((scale-factor
-	 (sqrt (/ (determinant (covariance-matrix ellipsoid))
-		  (expt pi (num-rows (covariance-matrix ellipsoid)))))))
+	 (sqrt (/ (m:determinant (ellipsoid:covariance-matrix ellipsoid))
+		  (expt :pi (num-rows (ellipsoid:covariance-matrix ellipsoid)))))))
     (lambda (point)
-      (let ((x-x0 (pdv point (center-point ellipsoid))))
-	(* (exp (- (dot-product x-x0
-				(matrix*vector (covariance-matrix ellipsoid)
-					       x-x0))))
+      (let ((x-x0 (pdv point (ellipsoid:center-point ellipsoid))))
+	(* (exp (- (v:dot-product x-x0
+                                  (matrix*vector (ellipsoid:covariance-matrix ellipsoid)
+                                                 x-x0))))
 	   scale-factor)))))
 
 
@@ -127,17 +105,9 @@ USA.
 ;;; inverse map.  This is, in general, a Jacobian.
 
 (define (push-ellipsoid-thru-map f df^-1 ellipsoid)
-  (let* ((new-center (f (center-point ellipsoid)))
+  (let* ((new-center (f (ellipsoid:center-point ellipsoid)))
 	 (variations (df^-1 new-center)))
     (make-ellipsoid new-center
-		    (m:* (transpose variations)
-			 (covariance-matrix ellipsoid)
-			 variations))))
-
-(make-arithmetic-package package-name
-  `(make ,make-ellipsoid)
-  `(center-point center-point)
-  `(covariance-matrix ,covariance-matrix)
-  `(joint-distribution ,joint-distribution)
-  `(probability-density ,probability-density)
-  `(push-ellipsoid-thru-map ,push-ellipsoid-thru-map)) )))
+		    (matrix*matrix (m:transpose variations)
+                                   (ellipsoid:covariance-matrix ellipsoid)
+                                   variations))))

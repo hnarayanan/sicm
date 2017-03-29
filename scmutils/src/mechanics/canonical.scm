@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -260,9 +260,7 @@ USA.
   (up 't
       (coordinate-tuple 'r 'phi)
       (momentum-tuple 'p_r 'p_phi))))
-(up (up 0 (up 0 0) (down 0 0))
-    (up (up 0 (up 0 0) (down 0 0)) (up 0 (up 0 0) (down 0 0)))
-    (down (up 0 (up 0 0) (down 0 0)) (up 0 (up 0 0) (down 0 0))))
+(up 0 (up 0 0) (down 0 0))
 
 
 ;;; but not all transforms are
@@ -303,9 +301,7 @@ USA.
 (print-expression
  ((time-independent-canonical? Cmix)
   a-state))
-(up (up 0 (up 0 0) (down 0 0))
-    (up (up 0 (up 0 0) (down 0 0)) (up 0 (up 0 0) (down 0 0)))
-    (down (up 0 (up 0 0) (down 0 0)) (up 0 (up 0 0) (down 0 0))))
+(up 0 (up 0 0) (down 0 0))
 
 (define (Cmix2 H-state)
   (let ((t (time H-state))
@@ -318,9 +314,7 @@ USA.
 (print-expression
  ((time-independent-canonical? Cmix2)
   a-state))
-(up (up 0 (up 0 0) (down 0 0))
-    (up (up 0 (up 0 0) (down 0 0)) (up 0 (up 0 0) (down 0 0)))
-    (down (up 0 (up 0 0) (down 0 0)) (up 0 (up 0 0) (down 0 0))))
+(up 0 (up 0 0) (down 0 0))
 |#
 
 #|
@@ -350,17 +344,6 @@ USA.
 
 (print-expression
  ((time-independent-canonical? (C 'm1 'm2)) b-state))
-(up
- (up 0 (up (up 0 0) (up 0 0)) (down (down 0 0) (down 0 0)))
- (up
-  (up (up 0 (up (up 0 0) (up 0 0)) (down (down 0 0) (down 0 0)))
-      (up 0 (up (up 0 0) (up 0 0)) (down (down 0 0) (down 0 0))))
-  (up (up 0 (up (up 0 0) (up 0 0)) (down (down 0 0) (down 0 0)))
-      (up 0 (up (up 0 0) (up 0 0)) (down (down 0 0) (down 0 0)))))
- (down
-  (down (up 0 (up (up 0 0) (up 0 0)) (down (down 0 0) (down 0 0)))
-        (up 0 (up (up 0 0) (up 0 0)) (down (down 0 0) (down 0 0))))
-  (down (up 0 (up (up 0 0) (up 0 0)) (down (down 0 0) (down 0 0)))
-        (up 0 (up (up 0 0) (up 0 0)) (down (down 0 0) (down 0 0))))))
+(up 0 (up (up 0 0) (up 0 0)) (down (down 0 0) (down 0 0)))
 
 |#

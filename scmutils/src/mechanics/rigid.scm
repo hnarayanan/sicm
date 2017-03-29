@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -501,6 +501,7 @@ USA.
            (Euler-state->omega-body Euler-state))))
   (let ((L0 ((qw-state->L-space A B C) qw-state0))
         (E0 ((T-body A B C) (ref qw-state0 2))))
+    (graphics-clear win)
     ((evolve qw-sysder A B C)
      qw-state0
      (monitor-errors win A B C L0 E0)

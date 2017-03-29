@@ -2,8 +2,8 @@
 
 Copyright (C) 1986, 1987, 1988, 1989, 1990, 1991, 1992, 1993, 1994,
     1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014 Massachusetts
-    Institute of Technology
+    2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016
+    Massachusetts Institute of Technology
 
 This file is part of MIT/GNU Scheme.
 
@@ -46,10 +46,11 @@ USA.
   (if (default-object? environment) (set! environment scmutils-base-environment))
   (if (default-object? declarations) (set! declarations '((usual-integrations))))
   (if (default-object? keep?) (set! keep? 'keep))
-  (compile-sexp ((compose generic->floating flonumize) sexp)
-		environment
-		declarations
-		keep?))
+  (compile-expression (text/cselim (gjs/cselim sexp))
+		      (compose generic->floating flonumize)
+		      environment
+		      declarations
+		      keep?))
 
 (define (compile-and-run-sexp sexp #!optional environment declarations keep?)
   (if (default-object? environment) (set! environment scmutils-base-environment))
@@ -62,9 +63,10 @@ USA.
   (if (default-object? declarations) (set! declarations '((usual-integrations))))
   (if (default-object? keep?) (set! keep? 'keep))
   (compile-expression (text/cselim (gjs/cselim sexp))
+		      (lambda (x) x)
 		      environment
-		      declarations keep?))
-
+		      declarations
+		      keep?))
 
 
 ;;; This takes a closed procedure and makes a faster one
@@ -115,23 +117,30 @@ USA.
   (access make-combination system-global-environment))
 
 
+(define (scode-operator-name operator)
+  (cond ((primitive-procedure? operator)
+	 (primitive-procedure-name operator))
+	(else
+	 (scode-variable-name operator))))
+
+
 ;;; Interface procedures to the Scheme compiler
 
 ;;; This compiles an s-expression to something that can be evaluated with scode-eval
 
-(define (compile-expression s-expression environment declarations keep-debugging-info?)
+(define (compile-expression s-expression scode-transformer environment declarations keep-debugging-info?)
   (fluid-let ((sf:noisy? #f))
     (compile-scode
-     (integrate/sexp s-expression environment declarations #f)
+     (scode-transformer (integrate/sexp s-expression environment declarations #f))
      (and keep-debugging-info? 'KEEP))))
 
 
 ;;; This compiles a procedure text
 
-(define (compile-procedure-text procedure-text declarations keep-debugging-info?)
+(define (compile-procedure-text procedure-text scode-transformer declarations keep-debugging-info?)
   (fluid-let ((sf:noisy? #f))
     (compile-scode
-     (integrate/scode (make-declaration declarations procedure-text) #f)
+     (scode-transformer (integrate/scode (make-declaration declarations procedure-text) #f))
      (and keep-debugging-info? 'KEEP))))
 
 
@@ -149,7 +158,8 @@ USA.
 				(do-expr (assignment-value expr)))))
 	   (combination
 	    ,(lambda (expr)
-	       (if (scode-variable? (scode-combination-operator expr))
+	       (if (or (primitive-procedure? (scode-combination-operator expr))
+		       (scode-variable? (scode-combination-operator expr)))
 		   (do-named-combination expr)
 		   (make-scode-combination (do-expr (scode-combination-operator expr))
 					   (map do-expr
@@ -196,7 +206,7 @@ USA.
    (lambda (expr)
      (let ((operator (scode-combination-operator expr))
 	   (operands (scode-combination-operands expr)))
-       (let ((operator-name (scode-variable-name operator)))
+       (let ((operator-name (scode-operator-name operator)))
 	 (case operator-name
 	   ((make-vector make-initialized-vector v:generate vector:generate
 	     make-list make-initialized-list
@@ -224,8 +234,8 @@ USA.
 	     exact->inexact)
 	    expr)
 	   ((expt)
-	    (let ((base (flonumize (car expr)))
-		  (e (cadr expr)))
+	    (let ((base (flonumize (car operands)))
+		  (e (cadr operands)))
 	      (if (exact-integer? e)
 		  (cond ((= e 0)
 			 1.)
@@ -265,18 +275,18 @@ USA.
        (lambda (expr)
 	 (let ((operator (scode-combination-operator expr))
 	       (operands (scode-combination-operands expr)))
-	   (let ((operator-name (scode-variable-name operator)))
+	   (let ((operator-name (scode-operator-name operator)))
 	     (case operator-name
-	       ((+)
+	       ((+ &+)
 		(apply (accumulation flo:+:bin 0.)
 		       (map generic->floating operands)))
-	       ((*)
+	       ((* &*)
 		(apply (accumulation flo:*:bin 1.)
 		       (map generic->floating operands)))
-	       ((-)
+	       ((- &-)
 		(apply (inverse-accumulation flo:-:bin flo:+:bin flo:-:una 0.)
 		       (map generic->floating operands)))
-	       ((/)
+	       ((/ &/)
 		(apply (inverse-accumulation flo:/:bin flo:*:bin flo:/:una 1.)
 		       (map generic->floating operands)))
 	       ((sqrt exp abs cos sin tan)
@@ -285,7 +295,7 @@ USA.
 		  (string->symbol
 		   (string-append "flo:"
 				  (symbol->string operator-name))))
-					(list (generic->floating (car operands)))))
+		 (list (generic->floating (car operands)))))
 	       (else
 		(if (string-prefix? "fix:" (symbol->string operator-name))
 		    expr
