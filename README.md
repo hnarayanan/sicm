@@ -135,8 +135,7 @@ hacking with Scheme even more fun.
   :ensure t
   :config
   (setenv "DISPLAY" ":0")
-  (setq geiser-active-implementations '(mit))
-  (add-hook 'geiser-repl-mode-hook 'hn-disable-trailing-whitespace-and-empty-lines))
+  (setq geiser-active-implementations '(mit)))
 
 (use-package geiser-mit
   :ensure t
