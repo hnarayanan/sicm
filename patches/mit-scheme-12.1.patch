@@ -1,0 +1,80 @@
+diff --git a/src/microcode/interp.c b/src/microcode/interp.c
+index dee98f6..a28b9a0 100644
+--- a/src/microcode/interp.c
++++ b/src/microcode/interp.c
+@@ -829,6 +829,7 @@ Interpret (void)
+ 
+       (APPLY_FRAME_PROCEDURE ()) = GET_VAL;
+       FALLTHROUGH ();
++/* fall through */
+     case RC_INTERNAL_APPLY:
+     internal_apply:
+ 
+diff --git a/src/microcode/syntax.c b/src/microcode/syntax.c
+index b8a07c9..4583f1e 100644
+--- a/src/microcode/syntax.c
++++ b/src/microcode/syntax.c
+@@ -509,6 +509,7 @@ DEFINE_PRIMITIVE ("SCAN-LIST-FORWARD", Prim_scan_list_forward, 7, 7, 0)
+ 	  LOSE_IF_RIGHT_END (start);
+ 	  MOVE_RIGHT (start);
+ 	  FALLTHROUGH ();
++/* fall through */
+ 	case syntaxcode_word:
+ 	case syntaxcode_symbol:
+ 	  if ((depth != 0) || (! sexp_flag))
+@@ -523,6 +524,7 @@ DEFINE_PRIMITIVE ("SCAN-LIST-FORWARD", Prim_scan_list_forward, 7, 7, 0)
+ 		  MOVE_RIGHT (start);
+ 		  LOSE_IF_RIGHT_END (start);
+ 		  FALLTHROUGH ();
++/* fall through */
+ 		case syntaxcode_word:
+ 		case syntaxcode_symbol:
+ 		  MOVE_RIGHT (start);
+@@ -978,6 +980,7 @@ DEFINE_PRIMITIVE ("SCAN-SEXPS-FORWARD", Prim_scan_sexps_forward, 7, 7, 0)
+ 		      DONE_IF (true);
+ 		    }
+ 		  FALLTHROUGH ();
++/* fall through */
+ 		case syntaxcode_word:
+ 		case syntaxcode_symbol:
+ 		  MOVE_RIGHT (start);
+diff --git a/src/microcode/ux.c b/src/microcode/ux.c
+index 1c4f0b5..44efa06 100644
+--- a/src/microcode/ux.c
++++ b/src/microcode/ux.c
+@@ -60,6 +60,7 @@ UX_prim_check_fd_errno (enum syscall_names name)
+ 	  deliver_pending_interrupts ();
+ 	}
+       FALLTHROUGH ();
++/* fall through */
+     default:
+       error_system_call (errno, name);
+     }
+diff --git a/src/microcode/uxsig.c b/src/microcode/uxsig.c
+index 4e1a46b..33d4a85 100644
+--- a/src/microcode/uxsig.c
++++ b/src/microcode/uxsig.c
+@@ -858,6 +858,7 @@ interactive_interrupt_handler (SIGCONTEXT_T * scp)
+ 	    termination_eof ();
+ 	  }
+ 	  FALLTHROUGH ();
++/* fall through */
+ 	default:
+ 	  if (!option_emacs_subprocess)
+ 	    print_interactive_help ();
+@@ -989,6 +990,7 @@ describe_sighnd (int signo, unsigned char c)
+ 	    }
+       }
+       FALLTHROUGH ();
++/* fall through */
+     default:
+       fputs ("When typed, this character will have an unknown effect.\n",
+ 	     stdout);
+@@ -1086,6 +1088,7 @@ reset_query (SIGCONTEXT_T * scp)
+ 	  EXIT_CRITICAL_SECTION ({});
+ 	  hard_reset (scp);
+ 	  FALLTHROUGH ();
++/* fall through */
+ 	case 'P':
+ 	default:
+ 	  return;

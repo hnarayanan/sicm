@@ -1,45 +1,66 @@
-# Working through the Structure and Interpretation of Classical Mechanics
+# Working Through Structure and Interpretation of Classical Mechanics
 
-_Structure and Interpretation of Classical Mechanics_ is a book by
-Gerald Jay Sussman and Jack Wisdom that aims to explain classical
-mechanics using the variational principle with no ambiguity. It does
-this by ensuring that every mathematical expression in the book is in
-one-to-one correspondence with an equivalent expression written in
-computer code. And computer code is nothing if not precise and
-unambiguous.
+This repository contains some notes on my progress through [Structure
+and Interpretation of Classical Mechanics][sicm]. This book lies at
+the intersection of things that matter very much to me: mechanics,
+mathematics and computation.
 
-In this repository, you will find all the code corresponding to the
-mathematics in the book, including the numerous interspersed
-exercises. This repository also holds the source code for the
-underlying Scheme library, `scmutils`, that is heavily employed in the
-book, along with notes on how to get all this working on OS X with
-`mit-scheme`.
+The crew behind this book (and the corresponding code) are a curious
+bunch and they have fun exploring their curiosities. They are slowly
+becoming my spiritual guides.
 
-If you are interested in classical mechanics in general but find this
-book a little too deep to jump into as a first step (as it was for
-me), I'd like to suggest the following courses, in order:
+These are mostly notes for myself, but it's great if you want to
+follow along.
 
-1. To whet your appetite: [Physics I: Classical Mechanics by Walter Lewin]
-(http://ocw.mit.edu/courses/physics/8-01-physics-i-classical-mechanics-fall-1999/)
+## Background Material
 
-2. To get an intuitive feeling for abstract theory: [Classical
-Mechanics by Leonard Susskind] (http://theoreticalminimum.com/courses/classical-mechanics/2011/fall)
+You can buy a physical copy of this book [at its official store
+page][sicm], or you can read [a beautiful rendition of the HTML
+version online][sicm-html]. There is also an MIT OCW course
+corresponding to it:
 
-3. To get a better handle on programming (and Scheme): [Structure and
-Interpretation of Computer Programs](http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-001-structure-and-interpretation-of-computer-programs-spring-2005/)
+- [Classical Mechanics: A Computational Approach by Prof. Gerald
+  Sussman and Jack Wisdom][cm-course-sussman-wisdom]
 
-## Installation
+The language used in this book and the accompanying library ([Scheme
+Mechanics or Scmutils][scmutils]) is called [Scheme][mit-scheme]. If
+you are interested in learning about it, the following course (and
+[related book][sicp]) is excellent:
 
-1. Install sudo port install mit-scheme (using Macports):
+-  [Structure And Interpretation Of Computer Programs by Hal Abelson
+   and Gerald Jay Sussman][programming-course-abelson-sussman]
 
-   sudo port install mit-scheme
+In addition to this, the following courses are also really
+interesting:
 
-2. Navigate to `sicm/scmutils/src` and run
+- [Classical Mechanics by Leonard Susskind][cm-course-susskind]
+- [Classical Physics by Venkataraman Balakrishnan][physics-course-balakrishnan]
+- [Fundamentals of Physics with Ramamurti Shankar][physics-course-shankar]
 
-   mit-scheme
-   (load "compile")
-   (load "load")
+## Following Along
+
+I happen to work on an Apple Silicon Mac, and part of this repository
+is a collection of notes and hacks needed to get [MIT
+Scheme][mit-scheme] and [Scmutils][scmutils] working nicely on it. (I
+also happen to use [GNU Emacs][gnu-emacs], so there will be some bonus
+material on how you can get a nice [REPL][wiki-repl] working in
+Emacs.)
 
 ## License
 
-TODO: GPL v3
+This tutorial is licensed under the [Creative Commons Attribution 4.0
+International License][license-cc-by].
+
+[cm-course-susskind]: http://theoreticalminimum.com/courses/classical-mechanics/2011/fall
+[cm-course-sussman-wisdom]: https://ocw.mit.edu/courses/12-620j-classical-mechanics-a-computational-approach-fall-2008/
+[gnu-emacs]: https://www.gnu.org/software/emacs/
+[license-cc-by]: https://creativecommons.org/licenses/by/4.0/
+[mit-scheme]: https://www.gnu.org/software/mit-scheme/
+[physics-course-balakrishnan]: https://www.youtube.com/playlist?list=PL5E4E56893588CBA8
+[physics-course-shankar]: https://www.youtube.com/playlist?list=PLFE3074A4CB751B2B
+[programming-course-abelson-sussman]: http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-001-structure-and-interpretation-of-computer-programs-spring-2005/
+[scmutils]: https://groups.csail.mit.edu/mac/users/gjs/6946/installation.html
+[sicm-html]: https://tgvaughan.github.io/sicm/
+[sicm]: https://mitpress.mit.edu/9780262028967/structure-and-interpretation-of-classical-mechanics/
+[sicp]: https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/index.html
+[wiki-repl]: https://en.wikipedia.org/wiki/Read–eval–print_loop
