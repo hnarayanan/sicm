@@ -39,11 +39,11 @@ interesting:
 
 ## Following Along
 
+### Base setup on macOS on Apple Silicon
+
 I happen to work on an Apple Silicon Mac, and part of this repository
 is a collection of notes and hacks needed to get [MIT
-Scheme][mit-scheme] and [Scmutils][scmutils] working nicely on it. I
-also happen to use [GNU Emacs][gnu-emacs], so there will be some bonus
-material on how you can get a nice [REPL][wiki-repl] working in Emacs.
+Scheme][mit-scheme] and [Scmutils][scmutils] working nicely on it.
 
 1. Install [XQuartz][xquartz]. This used to come bundled with Macs
    previously, but now needs to be installed by hand. You will need
@@ -98,19 +98,54 @@ material on how you can get a nice [REPL][wiki-repl] working in Emacs.
    ./install.sh
    ````
 
-   Now you can use a specialised script that starts Scheme and loads
-   Scmutils as it does so. It is already in the same path that the
-   `mit-scheme` binary was installed in. So you can just call it in
-   your shell.
+   This ends up installing a script (called `mechanics.sh`) that
+   starts Scheme and loads Scmutils as it does so. Since it is put in
+   the same path that the `mit-scheme` binary was installed in, you
+   can just run it from your shell.
 
    ````
    mechanics.sh
    ````
 
-   This is not a very nice name for a file, so you can call it
-   whatever else you want.
+   Which greets you with the following. Notice the modules loaded on
+   the last line. If you see these, it means you have it all working.
 
+   ````
+   MIT/GNU Scheme running under OS X
+   Type `^C' (control-C) followed by `H' to obtain information about interrupts.
 
+   Copyright (C) 2022 Massachusetts Institute of Technology
+   This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or
+   FITNESS FOR A PARTICULAR PURPOSE.
+
+   Image saved on Saturday September 2, 2023 at 2:29:59 AM
+     Release 12.1 || SF || CREF || LIAR/svm1 || SOS || XML || Edwin || X11 || X11-Screen || ScmUtils
+   ````
+
+### Integration with GNU Emacs
+
+I also happen to use [GNU Emacs][gnu-emacs], so here is some bonus
+material. If you add the following block to your Emacs configuration,
+they install and configure a package called [Geiser][emacs-geiser]
+that gets a nicer [REPL][wiki-repl] working in Emacs. This makes
+hacking with Scheme even more fun.
+
+````
+(use-package geiser
+  :ensure t
+  :config
+  (setenv "DISPLAY" ":0")
+  (setq geiser-active-implementations '(mit))
+  (add-hook 'geiser-repl-mode-hook 'hn-disable-trailing-whitespace-and-empty-lines))
+
+(use-package geiser-mit
+  :ensure t
+  :config
+  (setenv "MITSCHEME_HEAP_SIZE" "100000")
+  (setenv "MITSCHEME_LIBRARY_PATH" "/path/to/install/scheme/lib/mit-scheme-svm1-64le-12.1")
+  (setenv "MITSCHEME_BAND" "mechanics.com")
+  (setq geiser-mit-binary "/path/to/install/scheme/bin/mit-scheme"))
+````
 
 ## License
 
@@ -119,6 +154,7 @@ International License][license-cc-by].
 
 [cm-course-susskind]: http://theoreticalminimum.com/courses/classical-mechanics/2011/fall
 [cm-course-sussman-wisdom]: https://ocw.mit.edu/courses/12-620j-classical-mechanics-a-computational-approach-fall-2008/
+[emacs-geiser]: https://www.nongnu.org/geiser/
 [gnu-emacs]: https://www.gnu.org/software/emacs/
 [license-cc-by]: https://creativecommons.org/licenses/by/4.0/
 [mit-scheme]: https://www.gnu.org/software/mit-scheme/
