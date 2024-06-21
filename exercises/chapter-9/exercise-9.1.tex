@@ -1,0 +1,53 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1em}
+
+\begin{document}
+
+\section*{Exercise 9.1}
+
+We're given the following functions and asked about some of their
+derivatives.
+\begin{align*}
+  F(x, y) &= x^2 y^3 \\
+  G(x, y) &= (F(x, y), y) = (x^2 y^3, y) \\
+  H(x, y) &= F(F(x, y), y) = F(x^2 y^3, y) = (x^2 y^3)^2 y^3 = x^4 y^9
+\end{align*}
+In the calculus that follows, you'll notice that I map back to
+Leibniz's notation. While this feels like it goes against the spirit
+of the book, it's helpful until you're comfortable with functional
+notation.
+
+\section*{9.1 (a)}
+\begin{align*}
+  \partial_o F(x, y) &= \frac{\partial}{\partial x} x^2 y^3  = 2 x y^3 \\
+  \partial_1 F(x, y) &= \frac{\partial}{\partial y} x^2 y^3  = 3 x^2 y^2 \\
+\end{align*}
+
+\section*{9.1 (b)}
+\begin{align*}
+  \partial_o F(F(x, y), y) &= \partial_o H(x, y) = \frac{\partial}{\partial x} x^4 y^9 = 4 x^3 y^9 \\
+  \partial_1 F(F(x, y), y) &= \partial_1 H(x, y) = \frac{\partial}{\partial y} x^4 y^9 = 9 x^4 y^8
+\end{align*}
+
+\section*{9.1 (c)}
+\begin{align*}
+  \partial_o G(x, y) &= \frac{\partial}{\partial x} (x^2 y^3, y)  = (2 x y^3, 0) \\
+  \partial_1 G(x, y) &= \frac{\partial}{\partial y} (x^2 y^3, y)  = (3 x^2 y^2, 1) \\
+\end{align*}
+Notice that unlike $F$ and $H$ which return numbers, $G$ returns a
+tuple containing $F$. So its partial derivatives are also tuples, with
+one set of derivatives matching those computed for $F$ in 9.1 (a).
+
+\section*{9.1 (d)}
+\begin{align*}
+  DF(a, b) &= [2 a b^3, 3 a^2 b^2] \\
+  DG(3, 5) &= [(2\cdot3\cdot5^3, 0), (3\cdot3^2\cdot5, 1)] = [(750, 0), (675, 1)] \\
+  DH(3 a^2, 5 b^3) &= [4 (3 a^2)^3 (5 b^3)^9, 9 (3 a^2)^4 (5 b^3)^8] = [210937500 a^6 b^{27}, 284765625 a^8 b^{24}]
+\end{align*}
+
+\end{document}
