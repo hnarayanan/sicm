@@ -23,18 +23,21 @@ of the book, it's helpful until you're comfortable with functional
 notation.
 
 \section*{9.1 (a)}
+
 \begin{align*}
   \partial_o F(x, y) &= \frac{\partial}{\partial x} x^2 y^3  = 2 x y^3 \\
   \partial_1 F(x, y) &= \frac{\partial}{\partial y} x^2 y^3  = 3 x^2 y^2 \\
 \end{align*}
 
 \section*{9.1 (b)}
+
 \begin{align*}
   \partial_o F(F(x, y), y) &= \partial_o H(x, y) = \frac{\partial}{\partial x} x^4 y^9 = 4 x^3 y^9 \\
   \partial_1 F(F(x, y), y) &= \partial_1 H(x, y) = \frac{\partial}{\partial y} x^4 y^9 = 9 x^4 y^8
 \end{align*}
 
 \section*{9.1 (c)}
+
 \begin{align*}
   \partial_o G(x, y) &= \frac{\partial}{\partial x} (x^2 y^3, y)  = (2 x y^3, 0) \\
   \partial_1 G(x, y) &= \frac{\partial}{\partial y} (x^2 y^3, y)  = (3 x^2 y^2, 1) \\
@@ -44,6 +47,10 @@ tuple containing $F$. So its partial derivatives are also tuples, with
 one set of derivatives matching those computed for $F$ in 9.1 (a).
 
 \section*{9.1 (d)}
+
+To arrive at the following, we group the partial derivatives
+determined previously into tuples, and then substitute the given
+inputs.
 \begin{align*}
   DF(a, b) &= [2 a b^3, 3 a^2 b^2] \\
   DG(3, 5) &= [(2\cdot3\cdot5^3, 0), (3\cdot3^2\cdot5, 1)] = [(750, 0), (675, 1)] \\
