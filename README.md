@@ -10,7 +10,10 @@ bunch and they have fun exploring their curiosities. They are slowly
 becoming my spiritual guides.
 
 These are mostly notes for myself, but it's great if you want to
-follow along.
+follow along with:
+
+- [My experiments as I work through the book][gh-sicm-working]
+- [My solutions to the exercises in the book][gh-sicm-exercises]
 
 ## Background Material
 
@@ -22,12 +25,12 @@ corresponding to it:
 - [Classical Mechanics: A Computational Approach by Prof. Gerald
   Sussman and Jack Wisdom][cm-course-sussman-wisdom]
 
-The language used in this book and the accompanying library ([Scheme
-Mechanics or Scmutils][scmutils]) is called [Scheme][mit-scheme]. If
-you are interested in learning about it, the following course (and
-[related book][sicp]) is excellent:
+The programming language used in this book and the accompanying
+library ([Scheme Mechanics or Scmutils][scmutils]) is called
+[Scheme][mit-scheme]. If you are interested in learning about it, the
+following course (and [related book][sicp]) is excellent:
 
--  [Structure And Interpretation Of Computer Programs by Hal Abelson
+- [Structure And Interpretation Of Computer Programs by Hal Abelson
    and Gerald Jay Sussman][programming-course-abelson-sussman]
 
 In addition to this, the following courses are also really
@@ -154,6 +157,8 @@ International License][license-cc-by].
 [cm-course-susskind]: http://theoreticalminimum.com/courses/classical-mechanics/2011/fall
 [cm-course-sussman-wisdom]: https://ocw.mit.edu/courses/12-620j-classical-mechanics-a-computational-approach-fall-2008/
 [emacs-geiser]: https://www.nongnu.org/geiser/
+[gh-sicm-exercises]: https://github.com/hnarayanan/sicm/tree/main/exercises
+[gh-sicm-working]: https://github.com/hnarayanan/sicm/tree/main/working
 [gnu-emacs]: https://www.gnu.org/software/emacs/
 [license-cc-by]: https://creativecommons.org/licenses/by/4.0/
 [mit-scheme]: https://www.gnu.org/software/mit-scheme/
