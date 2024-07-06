@@ -1,0 +1,369 @@
+MIT/GNU Scheme running under OS X
+Type `^C' (control-C) followed by `H' to obtain information about interrupts.
+
+Copyright (C) 2022 Massachusetts Institute of Technology
+This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.
+
+Image saved on Saturday September 2, 2023 at 2:29:59 AM
+  Release 12.1 || SF || CREF || LIAR/svm1 || SOS || XML || Edwin || X11 || X11-Screen || ScmUtils
+;Loading "/Users/harish/.emacs.d/elpa/geiser-mit-20211204.1935/src/geiser/load.scm"...
+;  Loading "compile.scm"...
+;    Generating SCode for file: "emacs.scm" => "emacs.bin"... done
+;    Compiling file: "emacs.bin" => "emacs.com"... done
+;    Dumping "geiser-w32.pkd"... done
+;    Dumping "geiser-unx.pkd"... done
+;  ... done
+;  Loading "geiser-unx.pkd"... done
+;  Loading "emacs.com"...
+;    Loading "format.com"... done
+;  ... done
+;... done
+
+1 (user) => (+ 1 2.14)
+#| 3.14 |#
+
+2 error> (+ 1 (* 2 1.07))
+#| 3.14 |#
+
+2 error> (lambda (x) (* x x))
+#|
+(lambda (x)
+  ???)
+|#
+
+2 error> (lambda (x) (* x x) 4)
+#|
+(lambda (x)
+  ???)
+|#
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (lambda (x) (* x x) 4)
+#|
+(lambda (x)
+  ???)
+|#
+
+1 (user) => ((lambda (x) (* x x)) 4)
+#| 16 |#
+
+1 (user) => (define pi 3.141592653589793)
+#| pi |#
+
+1 (user) => (define square (lambda (x) (* x x)))
+#| square |#
+
+1 (user) => (* 4 pi (square 5))
+#| 314.1592653589793 |#
+
+1 (user) => (define (square x) (* x x))
+#| square |#
+
+1 (user) => (* 4 pi (square 5))
+#| 314.1592653589793 |#
+
+1 (user) => (define compose
+              (lambda (f g)
+                (lambda (x)
+                  (f (g x)))))
+#| compose |#
+
+1 (user) => ((compose square sin) 2)
+#| .826821810431806 |#
+
+1 (user) => (square (sin 2))
+#| .826821810431806 |#
+
+1 (user) => (define (compose f g)
+              (lambda (x)
+                (f (g x))))
+#| compose |#
+
+1 (user) => (define ((compose f g) x)
+              (f (g x)))
+#| compose |#
+
+1 (user) => ((compose square sin) 2)
+#| .826821810431806 |#
+
+1 (user) => (define (abs x)
+              (cond ((< x 0) (- x))
+                    ((= x 0) x)
+                    ((> x 0) x)))
+#| abs |#
+
+1 (user) => (abs -2)
+#| 2 |#
+
+1 (user) => (define (abs x)
+              (if (< x 0)
+                  (- x)
+                  x))
+#| abs |#
+
+1 (user) => (abs -10.3)
+#| 10.3 |#
+
+1 (user) => (abs - 10.3)
+
+;The procedure #[compound-procedure 27 abs] has been called with 2 arguments; it requires exactly 1 argument.
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (define (factorial n)
+              (if (= n 1)
+                  1
+                  (* n (factorial (- n 1)))))
+#| factorial |#
+
+1 (user) => (factorial 3)
+#| 6 |#
+
+1 (user) => (factorial 7)
+#| 5040 |#
+
+1 (user) => (define (f radius)
+              (let ((area (* 4 pi (square radius)))
+                    (volume (* 4/3 pi (cube radius))))
+                (/ volume area)))
+#| f |#
+
+1 (user) => (f 3)
+#| .9999999999999999 |#
+
+1 (user) => (define (factorial n)
+              (let factlp ((count 1) (answer 1))
+                (if (> count n)
+                    answer
+                    (factlp (+ count 1) (* count answer)))))
+#| factorial |#
+
+1 (user) => (factorial 7)
+#| 5040 |#
+
+1 (user) => (define a-list (list 6 946 8 356 12 620))
+#| a-list |#
+
+1 (user) => a-list
+#|
+(6 946 8 356 12 620)
+|#
+
+1 (user) => (list-ref a-list 3)
+#| 356 |#
+
+1 (user) => (list-ref a-list 0)
+#| 6 |#
+
+1 (user) => (car a-list)
+#| 6 |#
+
+1 (user) => (cdr a-list)
+#|
+(946 8 356 12 620)
+|#
+
+1 (user) => (define another-list
+              (cons 32 (cdr a-list)))
+#| another-list |#
+
+1 (user) => another-list
+#|
+(32 946 8 356 12 620)
+|#
+
+1 (user) => (car (cdr another-list))
+#| 946 |#
+
+1 (user) => (car (cdr a-list))
+#| 946 |#
+
+1 (user) => (define a-vector (vector 37 63 49 21 88 56))
+#| a-vector |#
+
+1 (user) => a-vector
+#|
+(up 37 63 49 21 88 56)
+|#
+
+1 (user) => (vector-ref a-vector 3)
+#| 21 |#
+
+1 (user) => (vector-ref a-vector 0)
+#| 37 |#
+
+1 (user) => (vector? a-vector)
+#| #t |#
+
+1 (user) => (vector? a-list)
+#| #f |#
+
+1 (user) => (list? a-vector)
+#| #f |#
+
+1 (user) => (pair? a-list)
+#| #t |#
+
+1 (user) => (list? a-list)
+#| #t |#
+
+1 (user) => (define (sum? expression)
+              (and (pair? expression)
+                   (eq? (car expression) '+)))
+#| sum? |#
+
+1 (user) => (sum? '(+ 3 a))
+#| #t |#
+
+1 (user) => (sum? '(* 3 a))
+#| #f |#
+
+1 (user) => (sum? (+ 3 1))
+#| #f |#
+
+1 (user) => (+ 3 1)
+#| 4 |#
+
+1 (user) => (define a 3)
+#| a |#
+
+1 (user) => (sum? (+ 3 a))
+#| #t |#
+
+1 (user) => (sum? (+ 3 a))
+#| #f |#
+
+1 (user) => (write-line 1 2)
+
+;The object 2, passed as an argument to write-line, is not the correct type.
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (write-line (list 1 2))
+(1 2)
+
+;No return value.
+
+1 (user) => (define (factorial n)
+              (let factlp ((count 1) (answer 1))
+                (write-line (list count answer))
+                (if (> count n)
+                    answer
+                    (factlp (+ count 1) (* count answer)))))
+#| factorial |#
+
+1 (user) => (factorial 5)
+(1 1)
+(2 1)
+(3 2)
+(4 6)
+(5 24)
+(6 120)
+#| 120 |#
+
+1 (user) => (define (make-counter)
+              (let ((count 0))
+                (lambda ()
+                  (set! count (+ count 1))
+                  count)))
+                
+#| make-counter |#
+
+1 (user) => (define c1 (make-counter))
+#| c1 |#
+
+1 (user) => (define c2 (make-counter))
+#| c2 |#
+
+1 (user) => (c1)
+#| 1 |#
+
+1 (user) => (c1)
+#| 2 |#
+
+1 (user) => (c1)
+#| 3 |#
+
+1 (user) => (c2)
+#| 1 |#
+
+1 (user) => (c2)
+#| 2 |#
+
+1 (user) => (c2)
+#| 3 |#
+
+1 (user) => (c1)
+#| 4 |#
+
+1 (user) => (define (make-collector)
+              (let ((lst '()))
+                (cons (lambda (new)
+                        (set! lst (cons new lst))
+                        new)
+                      (lambda () lst))))
+#| make-collector |#
+
+1 (user) => (define c3 (make-collector))
+#| c3 |#
+
+1 (user) => (define c4 (make-collector))
+#| c4 |#
+
+1 (user) => ((car c3) 42)
+#| 42 |#
+
+1 (user) => ((car c4) 'jerry)
+#| jerry |#
+
+1 (user) => ((car c3) 28)
+#| 28 |#
+
+1 (user) => ((car c3) 14)
+#| 14 |#
+
+1 (user) => ((car c4) 'jack)
+#| jack |#
+
+1 (user) => ((cdr c3))
+#|
+(14 28 42)
+|#
+
+1 (user) => c3
+#| (#[compound-procedure 29] . #[compound-procedure 30]) |#
+
+1 (user) => (car c3)
+#|
+(lambda (new)
+  ???)
+|#
+
+1 (user) => ((car c3))
+
+;The procedure #[compound-procedure 29] has been called with 0 arguments; it requires exactly 1 argument.
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => ((cdr c4))
+#|
+(jack jerry)
+|#
+
+1 (user) => 

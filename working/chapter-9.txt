@@ -1,0 +1,1068 @@
+MIT/GNU Scheme running under OS X
+Type `^C' (control-C) followed by `H' to obtain information about interrupts.
+
+Copyright (C) 2022 Massachusetts Institute of Technology
+This is free software; see the source for copying conditions. There is NO warranty; not even for MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.
+
+Image saved on Saturday September 2, 2023 at 2:29:59 AM
+  Release 12.1 || SF || CREF || LIAR/svm1 || SOS || XML || Edwin || X11 || X11-Screen || ScmUtils
+;Loading ".emacs.d/elpa/geiser-mit-0.15/src/geiser/load.scm"...
+;  Loading "compile.scm"...
+;    Generating SCode for file: "emacs.scm" => "emacs.bin"... done
+;    Compiling file: "emacs.bin" => "emacs.com"... done
+;    Dumping "geiser-w32.pkd"... done
+;    Dumping "geiser-unx.pkd"... done
+;  ... done
+;  Loading "geiser-unx.pkd"... done
+;  Loading "emacs.com"...
+;    Loading "format.com"... done
+;  ... done
+;... done
+
+1 (user) => (define d (lambda (x1 y1 x2 y2)
+                        (sqrt (+ (square (- x2 x1)) (square (- y2 y1))))))
+#| d |#
+
+1 (user) => (d 0.0 0.0 3.0 4.0)
+#| 5. |#
+
+1 (user) => (define h (compose cube sin))
+#| h |#
+
+1 (user) => (h 2)
+#| .7518269446689928 |#
+
+1 (user) => (cube (sin 2))
+#| .7518269446689928 |#
+
+1 (user) => (equal? (h 2) (cube (sin 2)))
+#| #t |#
+
+1 (user) => (define g (* cube sin))
+#| g |#
+
+1 (user) => (g 2)
+#| 7.274379414605454 |#
+
+1 (user) => (compose cube sin)
+#|
+(lambda (x)
+  ???)
+|#
+
+1 (user) => ((compose cube sin) 'a)
+#|
+(expt (sin a) 3)
+|#
+
+1 (user) => (- 1 (+ (square sin) (square cos)))
+#|
+(lambda (x)
+  ???)
+|#
+
+1 (user) => ((- 1 (+ (square sin) (square cos))) 'a)
+#| 0 |#
+
+1 (user) => (print-expression (compose cube sin))
+(lambda (x)
+  ???)
+
+;No return value.
+
+1 (user) => (print-expression ((compose cube sin) 'a))
+
+;Application of a number not allowed a ((#[compiled-closure 27 (lambda "mathutil" #x1c) #x11e1 #x130182df1 ...]))
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (print-expression ((compose cube sin) 'a))
+(expt (sin a) 3)
+
+;No return value.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (literal-function 'f)
+#| f |#
+
+1 (user) => ((literal-function 'f) 'x)
+#|
+(f x)
+|#
+
+1 (user) => (define f (literal-function 'f))
+#| f |#
+
+1 (user) => (define g (literal-function 'g))
+#| g |#
+
+1 (user) => (compose f g)
+#|
+(lambda (x)
+  ???)
+|#
+
+1 (user) => ((compose f g) 'x)
+#|
+(f (g x))
+|#
+
+1 (user) => (define g (literal-function 'g (-> (X Real Real) Real)))
+#| g |#
+
+1 (user) => (g 'a 'b)
+#|
+(g a b)
+|#
+
+1 (user) => (g 'a 'b 'c)
+
+;The procedure #[compiled-closure 28 (lambda "litfun" #x1c) #x45a #x130254182 ...] has been called with 3 arguments; it requires exactly 2 arguments.
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Unbalanced close parenthesis: #\)
+;To continue, call RESTART with an option number:
+; (RESTART 2) => Return to read-eval-print level 2.
+; (RESTART 1) => Return to read-eval-print level 1.
+
+3 error> (restart 1)
+
+;Abort!
+
+1 (user) => (D g)
+#|
+(lambda (x y)
+  ???)
+|#
+
+1 (user) => ((D g) 'a 'b)
+#|
+(down (((partial 0) g) a b) (((partial 1) g) a b))
+|#
+
+1 (user) => (define v (up 'v^0 'v^1 'v^2))
+#| v |#
+
+1 (user) => v
+#|
+(up v^0 v^1 v^2)
+|#
+
+1 (user) => (define u (down 'u_0 'u_1 'u_2))
+#| u |#
+
+1 (user) => u
+#|
+(down u_0 u_1 u_2)
+|#
+
+1 (user) => (define p (down 'p_0 'p_1 'p_2))
+#| p |#
+
+1 (user) => p
+#|
+(down p_0 p_1 p_2)
+|#
+
+1 (user) => clear
+#| #[compiled-closure 29 (lambda "output-port" #x1c) #x84 #x12ead8584 ...] |#
+
+1 (user) => (define s (up 't (up 'x 'y) (down 'p_x 'p_y)))
+#| s |#
+
+1 (user) => s
+#|
+(up t (up x y) (down p_x p_y))
+|#
+
+1 (user) => (component s)
+#|
+(lambda (x)
+  ???)
+|#
+
+1 (user) => ((component 0) s)
+#| t |#
+
+1 (user) => ((component 1) s)
+#|
+(up x y)
+|#
+
+1 (user) => ((component 1 0) s)
+#| x |#
+
+1 (user) => ((ref s 1 0))
+
+;Application of a number not allowed x (())
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (ref s 1 0)
+#| x |#
+
+1 (user) => (= ((component 1 0) s) (ref s 1 0))
+#| #f |#
+
+1 (user) => (equal? ((component 1 0) s) (ref s 1 0))
+#| #t |#
+
+1 (user) => p
+#|
+(down p_0 p_1 p_2)
+|#
+
+1 (user) => v
+#|
+(up v^0 v^1 v^2)
+|#
+
+1 (user) => (* p v)
+#|
+(+ (* p_0 v^0) (* p_1 v^1) (* p_2 v^2))
+|#
+
+1 (user) => (* p v)
+#|
+(+ (* p_0 v^0) (* p_1 v^1) (* p_2 v^2))
+|#
+
+1 (user) => ((D sin) 'x)
+#|
+(cos x)
+|#
+
+1 (user) => (D sin)
+#| a-euclidean-derivative |#
+
+1 (user) => (sin 'x)
+#|
+(sin x)
+|#
+
+1 (user) => ((D cos) 'x)
+#|
+(* -1 (sin x))
+|#
+
+1 (user) => (D (cos 'x))
+
+;Generic operator inapplicable: #[compiled-closure 30 (lambda "ghelper" #x3) #x59b #x12ff0c9cb ...] partial-derivative ((*number* (expression (cos x))) ())
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (cos 'x)
+#|
+(cos x)
+|#
+
+1 (user) => ((g(* 5 D) cos) 'x)
+#|
+(* -5 (sin x))
+|#
+
+1 (user) => 
+#| #f |#
+
+1 (user) => (+ D I)
+#|
+(+ D (lambda x ???))
+|#
+
+1 (user) => (* (+ D I) (- D I))
+#|
+(+ (expt D 2) (* -1 (expt (lambda x ???) 2)))
+|#
+
+1 (user) => (((* (+ D I) (- D I)) (literal-function 'f)) 'x)
+#|
+(+ (((expt D 2) f) x) (* -1 (f x)))
+|#
+
+1 (user) => g
+#| g |#
+
+1 (user) => ((D g) 'x 'y)
+#|
+(down (((partial 0) g) x y) (((partial 1) g) x y))
+|#
+
+1 (user) => h
+#| h |#
+
+1 (user) => (define (h s) (g (ref s 0) (ref s 1)))
+#| h |#
+
+1 (user) => (h (up 'x 'y))
+#|
+(g x y)
+|#
+
+1 (user) => h
+#| h |#
+
+1 (user) => g
+#| g |#
+
+1 (user) => (define g (literal-function 'g (-> (X Real Real) Real)))
+#| g |#
+
+1 (user) => (g 'x 'y)
+#|
+(g x y)
+|#
+
+1 (user) => s
+#|
+(up t (up x y) (down p_x p_y))
+|#
+
+1 (user) => (ref s 0)
+#| t |#
+
+1 (user) => (ref s 1)
+#|
+(up x y)
+|#
+
+1 (user) => (define (h s)
+              (g (ref s 0) (ref s 1)))
+#| h |#
+
+1 (user) => (h (up 'x 'y))
+#|
+(g x y)
+|#
+
+1 (user) => s
+#|
+(up t (up x y) (down p_x p_y))
+|#
+
+1 (user) => (h s)
+
+;Assertion failed: (&and (map (lambda (p x) (p x)) dpreds args)) "Wrong type argument -- LITERAL-FUNCTION" (g t #(x y))
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (g 'x 'y)
+#|
+(g x y)
+|#
+
+1 (user) => ((D g) (up 'x 'y))
+
+;The procedure #[compiled-closure 31 (lambda "deriv" #x2) #x8cc #x13019492c ...] has been called with 1 argument; it requires exactly 2 arguments.
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => ((D g) 'x 'y)
+#|
+(down (((partial 0) g) x y) (((partial 1) g) x y))
+|#
+
+1 (user) => ((D h) (up 'x 'y))
+#|
+(down (((partial 0) g) x y) (((partial 1) g) x y))
+|#
+
+1 (user) => s
+#|
+(up t (up x y) (down p_x p_y))
+|#
+
+1 (user) => (define helix (up cos sin identity))
+#| helix |#
+
+1 (user) => (helix 't)
+#|
+(up (cos t) (sin t) t)
+|#
+
+1 (user) => (D helix)
+#| a-euclidean-derivative |#
+
+1 (user) => ((D helix) 't)
+#|
+(up (* -1 (sin t)) (cos t) 1)
+|#
+
+1 (user) => (define (g x y))
+
+;Ill-formed syntax: (define (g x y))
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (define (g x y)
+(up (square (+ x y)) (cube (- y x)) (exp (+ x y))))
+#| g |#
+
+1 (user) => g
+#| g |#
+
+1 (user) => (g 'x 'y)
+#|
+(up (+ (expt x 2) (* 2 x y) (expt y 2))
+    (+ (* -1 (expt x 3)) (* 3 (expt x 2) y) (* -3 x (expt y 2)) (expt y 3))
+    (* (exp y) (exp x)))
+|#
+
+1 (user) => (g 'a 'b)
+#|
+(up (+ (expt a 2) (* 2 a b) (expt b 2))
+    (+ (* -1 (expt a 3)) (* 3 (expt a 2) b) (* -3 a (expt b 2)) (expt b 3))
+    (* (exp b) (exp a)))
+|#
+
+1 (user) => helix
+#|
+(up cos sin identity)
+|#
+
+1 (user) => (D helix)
+#| a-euclidean-derivative |#
+
+1 (user) => ((D helix) 't)
+#|
+(up (* -1 (sin t)) (cos t) 1)
+|#
+
+1 (user) => (define g (up (square (+ 'x 'y)) (expt (cube (- 'y 'x) 3)) (expt (+ 'x 'y))))
+
+;The procedure #[compiled-procedure 32 (g:expt "generic" #x1f) #x14 #x12ff0f9cc] has been called with 1 argument; it requires exactly 2 arguments.
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (define (g x y)
+              (up (square (+ x y)) (cube (- y x)) (exp (+ x y))))
+#| g |#
+
+1 (user) => g
+#| g |#
+
+1 (user) => (g 'a 'b)
+#|
+(up (+ (expt a 2) (* 2 a b) (expt b 2))
+    (+ (* -1 (expt a 3)) (* 3 (expt a 2) b) (* -3 a (expt b 2)) (expt b 3))
+    (* (exp b) (exp a)))
+|#
+
+1 (user) => ((D g) 'x 'y)
+#|
+(down (up (+ (* 2 x) (* 2 y)) (+ (* -3 (expt x 2)) (* 6 x y) (* -3 (expt y 2))) (* (exp y) (exp x)))
+      (up (+ (* 2 x) (* 2 y)) (+ (* 3 (expt x 2)) (* -6 x y) (* 3 (expt y 2))) (* (exp y) (exp x))))
+|#
+
+1 (user) => (define (F x y) (* (square x) (cube y)))
+#| F |#
+
+1 (user) => (F 'x 'y)
+#|
+(* (expt x 2) (expt y 3))
+|#
+
+1 (user) => (define (G x y) (up (F x y) y))
+#| G |#
+
+1 (user) => (G 'x 'y)
+#|
+(up (* (expt x 2) (expt y 3)) y)
+|#
+
+1 (user) => (define H (compose F G))
+#| H |#
+
+1 (user) => (H 'x 'y)
+
+;The procedure #[compound-procedure 33 F] has been called with 1 argument; it requires exactly 2 arguments.
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => H
+#| H |#
+
+1 (user) => (define (h x y)
+              (f (f x y) y))
+#| h |#
+
+1 (user) => (define (H x y)
+              (f (f x y) y))
+#| H |#
+
+1 (user) => F
+#| F |#
+
+1 (user) => G
+#| G |#
+
+1 (user) => H
+#| H |#
+
+1 (user) => (F 'x 'y)
+#|
+(* (expt x 2) (expt y 3))
+|#
+
+1 (user) => (G 'x 'y)
+#|
+(up (* (expt x 2) (expt y 3)) y)
+|#
+
+1 (user) => (H 'x 'y)
+
+;The procedure #[compiled-closure 34 (lambda "litfun" #x1c) #x420 #x1300671d0 ...] has been called with 2 arguments; it requires exactly 1 argument.
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (define (f x y)
+  (* (square x) (cube y)))
+
+(define (g x y)
+  (up (f x y) y))
+
+(define (h x y)
+  (f (f x y) y))
+#| f |#
+
+2 error> #| g |#
+
+2 error> #| h |#
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (define (f x y)
+  (* (square x) (cube y)))
+
+(define (g x y)
+  (up (f x y) y))
+
+(define (h x y)
+  (f (f x y) y))
+#| f |#
+
+1 (user) => #| g |#
+
+1 (user) => #| h |#
+
+1 (user) => (g 'x 'y)
+#|
+(up (* (expt x 2) (expt y 3)) y)
+|#
+
+1 (user) => (h 'x 'y)
+#|
+(* (expt x 4) (expt y 9))
+|#
+
+1 (user) => F
+#| F |#
+
+1 (user) => (F 'x 'y)
+#|
+(* (expt x 2) (expt y 3))
+|#
+
+1 (user) => ((D F) 'x 'y)
+#|
+(down (* 2 x (expt y 3)) (* 3 (expt x 2) (expt y 2)))
+|#
+
+1 (user) => (ref ((D F) 'x 'y)) 0)
+#|
+(down (* 2 x (expt y 3)) (* 3 (expt x 2) (expt y 2)))
+|#
+
+1 (user) => #| 0 |#
+
+1 (user) => (ref (D F) 'x 'y) 0)
+#|
+(lambda (x y)
+  ???)
+|#
+
+1 (user) => #| 0 |#
+
+1 (user) => (ref (D F)) 0)
+#|
+(lambda (x y)
+  ???)
+|#
+
+1 (user) => #| 0 |#
+
+1 (user) => ((ref (D F)) 0) 'x 'y)
+
+;The procedure #[compiled-closure 35 (lambda "deriv" #x2) #x8cc #x13019492c ...] has been called with 1 argument; it requires exactly 2 arguments.
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> #| x |#
+
+2 error> #| y |#
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => ((component 0) (D F))
+#|
+(lambda (x y)
+  ???)
+|#
+
+1 (user) => ((component 0) ((D F) 'x 'y))
+#|
+(* 2 x (expt y 3))
+|#
+
+1 (user) => ((component 1) ((D F) 'x 'y))
+#|
+(* 3 (expt x 2) (expt y 2))
+|#
+
+1 (user) => ((D H) 'x 'y)
+#|
+(down (* 4 (expt x 3) (expt y 9)) (* 9 (expt x 4) (expt y 8)))
+|#
+
+1 (user) => ((component 0) ((D H) 'x 'y))
+#|
+(* 4 (expt x 3) (expt y 9))
+|#
+
+1 (user) => ((component 1) ((D H) 'x 'y))
+#|
+(* 9 (expt x 4) (expt y 8))
+|#
+
+1 (user) => (H 'x 'y)
+#|
+(* (expt x 4) (expt y 9))
+|#
+
+1 (user) => F
+#| F |#
+
+1 (user) => (F 'x 'y)
+#|
+(* (expt x 2) (expt y 3))
+|#
+
+1 (user) => (G 'x 'y)
+#|
+(up (* (expt x 2) (expt y 3)) y)
+|#
+
+1 (user) => (define (H x y)
+              (f (f x y) y))
+#| h |#
+
+1 (user) => (define (H x y)
+              (f (f x y) y))
+#| H |#
+
+1 (user) => ((component 0) ((D H) 'x 'y))
+#|
+(* 4 (expt x 3) (expt y 9))
+|#
+
+1 (user) => (let ((f (down ((partial 0) F) ((partial 1) F))))
+  (->tex-equation
+   (f 'x 'y)))
+
+;Unbound variable: ->tex-equation
+;To continue, call RESTART with an option number:
+; (RESTART 3) => Specify a value to use instead of ->tex-equation.
+; (RESTART 2) => Define ->tex-equation to a given value.
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (F 'x 'y)
+#|
+(* (expt x 2) (expt y 3))
+|#
+
+1 (user) => (G 'x 'y)
+#|
+(up (* (expt x 2) (expt y 3)) y)
+|#
+
+1 (user) => (H 'x 'y)
+#|
+(* (expt x 4) (expt y 9))
+|#
+
+1 (user) => (((component 0) (D G)) 'x 'y)
+#|
+(up (* 2 x (expt y 3)) 0)
+|#
+
+1 (user) => (((component 1) (D G)) 'x 'y)
+#|
+(up (* 3 (expt x 2) (expt y 2)) 1)
+|#
+
+1 (user) => ((partial 0) F)
+#|
+(lambda (x y)
+  ???)
+|#
+
+1 (user) => (((partial 0) F) 'x 'y)
+#|
+(* 2 x (expt y 3))
+|#
+
+1 (user) => (down (((partial 0) F) 'x 'y))
+#|
+(down (* 2 x (expt y 3)))
+|#
+
+1 (user) => ((D H) 'x 'y)
+#|
+(down (* 4 (expt x 3) (expt y 9)) (* 9 (expt x 4) (expt y 8)))
+|#
+
+1 (user) => (H 'x 'y)
+#|
+(* (expt x 4) (expt y 9))
+|#
+
+1 (user) => (F 'x 'y)
+#|
+(* (expt x 2) (expt y 3))
+|#
+
+1 (user) => ((D F) 'x 'y)
+#|
+(down (* 2 x (expt y 3)) (* 3 (expt x 2) (expt y 2)))
+|#
+
+1 (user) => (G 'x 'y)
+#|
+(up (* (expt x 2) (expt y 3)) y)
+|#
+
+1 (user) => (((D G) 'x 'y)
+#|
+(down (up (* 2 x (expt y 3)) 0) (up (* 3 (expt x 2) (expt y 2)) 1))
+|#
+
+1 (user) => (((D G) 'x 'y) ref 0)
+
+;Application of a number not allowed (*number* (expression (* 2 x y y ...))) ((#[compiled-procedure 36 (g:ref "mathutil" #x13) #x14 #x130126f7c] 0))
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart)
+
+;Choose an option by number:
+;  1: Return to read-eval-print level 1.
+
+Option number: 1
+
+;Abort!
+
+1 (user) => ((D G) 'x 'y))
+
+#|
+(down (up (* 2 x (expt y 3)) 0) (up (* 3 (expt x 2) (expt y 2)) 1))
+|#
+
+1 (user) => ((D F) 'a 'b)
+#|
+(down (* 2 a (expt b 3)) (* 3 (expt a 2) (expt b 2)))
+|#
+
+1 (user) => ((D G) 3 5)
+#|
+(down (up 750 0) (up 675 1))
+|#
+
+1 (user) => ((D H) (* 3 (expt 'a 2)) (* 5 (expt b 3)))
+
+;Unbound variable: b
+;To continue, call RESTART with an option number:
+; (RESTART 3) => Specify a value to use instead of b.
+; (RESTART 2) => Define b to a given value.
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (* 3 (expt 'a 2))
+#|
+(* 3 (expt a 2))
+|#
+
+1 (user) => (* 5 (expt b 3))
+
+;Unbound variable: b
+;To continue, call RESTART with an option number:
+; (RESTART 3) => Specify a value to use instead of b.
+; (RESTART 2) => Define b to a given value.
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (* 5 (expt 'b 3))
+#|
+(* 5 (expt b 3))
+|#
+
+1 (user) => ((D H) (* 3 (expt 'a 2)) (* 5 (expt 'b 3)))
+#|
+(down (* 210937500 (expt a 6) (expt b 27)) (* 284765625 (expt a 8) (expt b 24)))
+|#
+
+1 (user) => (define F2 (lambda v) 
+              (v))
+
+;Ill-formed syntax: (lambda v)
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (define F2 (lambda (v) 
+              (v)))
+#| F2 |#
+
+2 error> (define F2 (lambda (v) 
+              ()))
+#| F2 |#
+z3
+2 error> (define F2 (lambda (v) 
+              (let ((x (ref v 0))
+                    (y (ref v 1))
+                    (* (square x) (cube y))))))
+
+;Ill-formed syntax: (let ((x (ref v 0)) (y (ref v 1)) (* (square x) (cube y))))
+;To continue, call RESTART with an option number:
+; (RESTART 2) => Return to read-eval-print level 2.
+; (RESTART 1) => Return to read-eval-print level 1.
+
+3 error> (restart 1)
+
+;Abort!
+x
+1 (user) => (define a (lambda (b) (square b)))
+#| a |#
+
+1 (user) => (a 2)
+#| 4 |#
+
+1 (user) => (define (a b) (square b))
+#| a |#
+
+1 (user) => (a 3)
+#| 9 |#
+
+1 (user) => ((partial 0 F) 'x 'y)
+
+;The procedure #[compiled-closure 37 (lambda "generic" #x10) #x9b #x13002d4a3 ...] has been called with 2 arguments; it requires exactly 1 argument.
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (return 1)
+
+;Unbound variable: return
+;To continue, call RESTART with an option number:
+; (RESTART 4) => Specify a value to use instead of return.
+; (RESTART 3) => Define return to a given value.
+; (RESTART 2) => Return to read-eval-print level 2.
+; (RESTART 1) => Return to read-eval-print level 1.
+
+3 error> (restart 1)
+
+;Abort!
+
+1 (user) => ((D F) 'x 'y)
+#|
+(down (* 2 x (expt y 3)) (* 3 (expt x 2) (expt y 2)))
+|#
+
+1 (user) => ((component 0) ((D F) 'x 'y))
+#|
+(* 2 x (expt y 3))
+|#
+
+1 (user) => ((component 1) ((D F) 'x 'y))
+#|
+(* 3 (expt x 2) (expt y 2))
+|#
+
+1 (user) => ((component 0) ((D H) 'x 'y))
+#|
+(* 4 (expt x 3) (expt y 9))
+|#
+
+1 (user) => ((component 1) ((D H) 'x 'y))
+#|
+(* 9 (expt x 4) (expt y 8))
+|#
+
+1 (user) => ((component 0) ((D G) 'x 'y))
+#|
+(up (* 2 x (expt y 3)) 0)
+|#
+
+1 (user) => ((component 1) ((D G) 'x 'y))
+#|
+(up (* 3 (expt x 2) (expt y 2)) 1)
+|#
+
+1 (user) => ((D G) 3 5)
+#|
+(down (up 750 0) (up 675 1))
+|#
+
+1 (user) => (define expr '(integrate (* x (sin x)) x))
+#| expr-tag |#
+
+1 (user) => expr
+#|
+(integrate (* x (sin x)) x)
+|#
+
+1 (user) => (latexize expr)
+
+;Unbound variable: latexize
+;To continue, call RESTART with an option number:
+; (RESTART 3) => Specify a value to use instead of latexize.
+; (RESTART 2) => Define latexize to a given value.
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (expression->tex-string expr)
+#| "\\boxit{ $$integrate\\left( x \\sin\\left( x \\right), x \\right)$$}" |#
+
+1 (user) => (expression->tex-string ((D H) (* 3 (expt 'a 2)) (* 5 (expt 'b 3))))
+
+;The object #((*number* (expression (* 210937500 (expt a 2) (expt a 2) (expt b 3) (expt b 3) (expt b 3) (expt a 2) (expt b 3) (expt b 3) (expt b 3) (expt b 3) (expt b 3) (expt b 3)))) (*number* (expression (+ (* 2531250 (expt a 2) (expt a 2) (expt b 3) (expt b 3) (expt b 3) (expt a 2) (expt a 2) (+ (* 5 (+ (* 5 (expt b 3)) (* 5 (expt b 3))) (expt b 3)) (* 25 (expt b 3) (expt b 3))) (expt b 3) (expt b 3) (expt b 3)) (* 1265625 (expt a 2) (expt a 2) (expt b 3) (expt b 3) (expt b 3) (expt a 2) (expt a 2) (expt b 3) (expt b 3) (expt b 3) (+ (* 5 (+ (* 5 (expt b 3)) (* 5 (expt b 3))) (expt b 3)) (* 25 (expt b 3) (expt b 3)))))))), passed as the first argument to car, is not the correct type.
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (expression->tex-string (sin 'a))
+#| "\\boxit{ $$*number*\\left( expression\\left( \\sin\\left( a \\right) \\right) \\right)$$}" |#
+
+1 (user) => (D H) (* 3 (expt 'a 2)) (* 5 (expt 'b 3))
+#|
+(lambda (x y)
+  ???)
+|#
+
+1 (user) => #|
+(* 3 (expt a 2))
+|#
+
+1 (user) => #|
+(* 5 (expt b 3))
+|#
+
+1 (user) => ((D H) (* 3 (expt 'a 2)) (* 5 (expt 'b 3)))
+#|
+(down (* 210937500 (expt a 6) (expt b 27)) (* 284765625 (expt a 8) (expt b 24)))
+|#
+
+1 (user) => (define expr ((D H) (* 3 (expt 'a 2)) (* 5 (expt 'b 3))))
+#| expr-tag |#
+
+1 (user) => exprt
+
+;Unbound variable: exprt
+;To continue, call RESTART with an option number:
+; (RESTART 3) => Specify a value to use instead of exprt.
+; (RESTART 2) => Define exprt to a given value.
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => expr
+#|
+(down (* 210937500 (expt a 6) (expt b 27)) (* 284765625 (expt a 8) (expt b 24)))
+|#
+
+1 (user) => (expression->tex-string expr)
+
+;The object #((*number* (expression (* 210937500 (expt a 2) (expt a 2) (expt b 3) (expt b 3) (expt b 3) (expt a 2) (expt b 3) (expt b 3) (expt b 3) (expt b 3) (expt b 3) (expt b 3)))) (*number* (expression (+ (* 2531250 (expt a 2) (expt a 2) (expt b 3) (expt b 3) (expt b 3) (expt a 2) (expt a 2) (+ (* 5 (+ (* 5 (expt b 3)) (* 5 (expt b 3))) (expt b 3)) (* 25 (expt b 3) (expt b 3))) (expt b 3) (expt b 3) (expt b 3)) (* 1265625 (expt a 2) (expt a 2) (expt b 3) (expt b 3) (expt b 3) (expt a 2) (expt a 2) (expt b 3) (expt b 3) (expt b 3) (+ (* 5 (+ (* 5 (expt b 3)) (* 5 (expt b 3))) (expt b 3)) (* 25 (expt b 3) (expt b 3)))))))), passed as the first argument to car, is not the correct type.
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => ((component 0) expr)
+#|
+(* 210937500 (expt a 6) (expt b 27))
+|#
+
+1 (user) => (expression-tex-string ((component 0) expr))
+
+;Unbound variable: expression-tex-string
+;To continue, call RESTART with an option number:
+; (RESTART 3) => Specify a value to use instead of expression-tex-string.
+; (RESTART 2) => Define expression-tex-string to a given value.
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (message "hellp")
+
+hellp
+;No return value.
+
+1 (user) => 
