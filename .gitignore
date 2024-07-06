@@ -1,6 +1,5 @@
 *.aux
 *.log
-*.scm
 *~
 .DS_Store
 \#*#
