@@ -49,6 +49,7 @@ interesting:
 - [Classical Mechanics by Leonard Susskind][cm-course-susskind]
 - [Classical Physics by Venkataraman Balakrishnan][physics-course-balakrishnan]
 - [Fundamentals of Physics with Ramamurti Shankar][physics-course-shankar]
+- [Nonlinear Dynamics and Chaos by Steven Strogatz][physics-course-srogatz]
 
 ## Following Along
 
@@ -175,10 +176,11 @@ Attribution 4.0 International License][license-cc-by].
 [mit-scheme]: https://www.gnu.org/software/mit-scheme/
 [physics-course-balakrishnan]: https://www.youtube.com/playlist?list=PL5E4E56893588CBA8
 [physics-course-shankar]: https://www.youtube.com/playlist?list=PLFE3074A4CB751B2B
+[physics-course-strogatz]: https://www.youtube.com/playlist?list=PLbN57C5Zdl6j_qJA-pARJnKsmROzPnO9V
 [programming-course-abelson-sussman]: http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-001-structure-and-interpretation-of-computer-programs-spring-2005/
 [scmutils]: https://groups.csail.mit.edu/mac/users/gjs/6946/installation.html
-[sicm-unofficial-html]: https://tgvaughan.github.io/sicm/
 [sicm-html]: https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/9579/sicm_edition_2.zip/book.html
+[sicm-unofficial-html]: https://tgvaughan.github.io/sicm/
 [sicm]: https://mitpress.mit.edu/9780262028967/structure-and-interpretation-of-classical-mechanics/
 [sicp]: https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/index.html
 [wiki-repl]: https://en.wikipedia.org/wiki/Read–eval–print_loop
