@@ -1,0 +1,90 @@
+\documentclass{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{hyperref}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{1em}
+
+\begin{document}
+
+\section*{Exercise 1.1}
+
+For each of the mechanical systems described below, give the number of
+degrees of freedom of the configuration space.
+
+\section*{1.1 (a)}
+
+Three juggling pins.
+
+Rigid bodies generally have 6 degrees of freedom: three parameters to
+specify their position in space and three to specify their
+orientation.
+
+Since we have three pins, the number of degrees of freedom is
+$6 \times 3 = \boxed{18}$.
+
+\section*{1.1 (b)}
+
+A spherical pendulum, consisting of a point mass (the pendulum bob)
+hanging from a rigid massless rod attached to a fixed support point.
+The pendulum bob may move in any direction subject to the constraint
+imposed by the rigid rod. The point mass is subject to the uniform
+force of gravity.
+
+A point mass generally has three degrees of freedom, corresponding to
+its position in space. The rod acts as a constraint, forcing it to
+move on a spherical surface. Therefore, the number of degrees of
+freedom are $3 - 1 = \boxed{2}$.
+
+These correspond to the two angles you need to know ($\theta$ (polar)
+and $\phi$ (azimuth)) to locate the pendulum bob.
+\href{https://en.wikipedia.org/wiki/Spherical_pendulum}{Wikipedia has
+  a good diagram of these angles.}
+
+\section*{1.1 (c)}
+
+A spherical double pendulum, consisting of one point mass hanging from
+a rigid massless rod attached to a second point mass hanging from a
+second massless rod attached to a fixed support point. The point
+masses are subject to the uniform force of gravity.
+
+This is just the double of the previous answer, as we have two point
+masses and two constraints. $2 \times (3 - 1) = \boxed{4}$.
+
+\section*{1.1 (d)}
+
+A point mass sliding without friction on a rigid curved wire.
+
+Since we know about the shape of the curved wire, the point mass is
+simply moving in a 1D curve in 3D space. Therefore all we we have is
+\fbox{1} degree of freedom, which is how far along the wire it is.
+
+\section*{1.1 (e)}
+
+A top consisting of a rigid axisymmetric body with one point on the
+symmetry axis of the body attached to a fixed support, subject to a
+uniform gravitational force.
+
+Since one point of the top is fixed, its translational freedom goes
+away leaving us with only three degrees of freedom for its
+orientation. Further, because it's axisymmetric, it loses one of these
+degrees of freedom as you cannot discern rotations about its axis of
+symmetry.
+
+Therefore, we this has $3 - 1 = \boxed{2}$ degrees of freedom. These
+correspond to the two angles needed to describe the orientation of its
+axis of symmetry.
+
+\section*{1.1 (f)}
+
+The same as (e), but not axisymmetric.
+
+Because it's not axisymmetric, we don't lose that one rotational
+degree of freedom (rotation about its axis of symmetry) we subtracted
+above. So this case has \fbox{3} degrees of freedom. These correspond
+to two angles needed to specify the orientation of its axis of
+rotation, and one to specify its rotation about that axis.
+
+\end{document}
