@@ -1,0 +1,109 @@
+MIT/GNU Scheme running under OS X
+Type `^C' (control-C) followed by `H' to obtain information about interrupts.
+
+Copyright (C) 2022 Massachusetts Institute of Technology
+This is free software; see the source for copying conditions. There is NO warranty; not even for
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Image saved on Saturday September 2, 2023 at 2:29:59 AM
+  Release 12.1 || SF || CREF || LIAR/svm1 || SOS || XML || Edwin || X11 || X11-Screen || ScmUtils
+;Loading "/Users/harish/.emacs.d/elpa/geiser-mit-20211204.1935/src/geiser/load.scm"...
+;  Loading "compile.scm"...
+;    Generating SCode for file: "emacs.scm" => "emacs.bin"... done
+;    Compiling file: "emacs.bin" => "emacs.com"... done
+;    Dumping "geiser-w32.pkd"... done
+;    Dumping "geiser-unx.pkd"... done
+;  ... done
+;  Loading "geiser-unx.pkd"... done
+;  Loading "emacs.com"...
+;    Loading "format.com"... done
+;  ... done
+;... done
+
+1 (user) => (define win1 (frame 0 7 -2 2))
+
+;Could not open display: ":0"
+;To continue, call RESTART with an option number:
+; (RESTART 2) => Return to read-eval-print level 2.
+; (RESTART 1) => Return to read-eval-print level 1.
+
+3 error> (restart 1)
+
+;Abort!
+
+1 (user) => (define win1 (frame 0 7 -2 2))
+#| win1 |#
+
+1 (user) => (plot-function win1 sin 0 7 0.01)
+
+;No return value.
+
+1 (user) => (plot-function win1 sin 0 7 0.01)
+
+;No return value.
+
+1 (user) => (plot-function win1 cos 0 7 0.01)
+((result "((cos (\"args\" ((\"required\" z) (\"optional\") (\"key\")))) (plot-function (\"args\" ((\"required\" window f) (\"optional\" x0 x1 dx) (\"key\")))))") (output . ""))
+;No return value.
+
+1 (user) => 
+;No return value.
+
+1 (user) => (graphics-clear win1)
+
+;No return value.
+
+1 (user) => (plot-function win1 sin 0 7 0.01)
+
+;No return value.
+
+1 (user) => (plot-function win1 cos 0 7 0.01)
+
+;No return value.
+
+1 (user) => (plot-point win1 4 1)
+
+;No return value.
+
+1 (user) => (plot-line win1 4 1 5 2)
+
+;No return value.
+
+1 (user) => (define (something t)
+              (cons (square t) (cube t)))
+#| something |#
+
+1 (user) => (plot-parametric win1 0 10 0.01)
+
+;The procedure #[compiled-procedure 27 (plot-parametric "open" #x16) #x14 #x107238964] has been called with 4 arguments; it requires exactly 5 arguments.
+;To continue, call RESTART with an option number:
+; (RESTART 1) => Return to read-eval-print level 1.
+
+2 error> (restart 1)
+
+;Abort!
+
+1 (user) => (plot-parametric win1 something 0 10 0.01)
+
+;No return value.
+
+1 (user) => (get-pointer-coordinates win1 list)
+#|
+(3.643573522567749 .7547168731689453 0)
+|#
+
+1 (user) => (get-pointer-coordinates win1 list)
+#|
+(3.4010939598083496 -1.5902965068817139 0)
+|#
+
+1 (user) => (get-pointer-coordinates win1 list)
+#|
+(6.961714267730713 1.9676549434661865 0)
+|#
+
+1 (user) => 
+X IO Error
+
+It's been nice interacting with you!
+Press C-c C-z to bring me back.
