@@ -27,7 +27,6 @@ page][sicm],
 - Read [the freely-available official HTML version][sicm-html], or
 - Read [a beautiful unofficial version][sicm-unofficial-html] online.
 
-
 There is also an MIT OCW course corresponding to it:
 
 - [Classical Mechanics: A Computational Approach by Prof. Gerald
@@ -69,7 +68,7 @@ Scheme][mit-scheme] and [Scmutils][scmutils] working nicely on it.
 2. Fetch, unpack and patch recent source code for MIT Scheme. At the
    time of writing, this is version 12.1. For some technical reasons,
    there is no native-code support for Apple Silicon, and you need to
-   fetch the SVM1 binaries which work (a little slow).
+   fetch the SVM1 binaries which work (albeit a little slowly).
 
    ````
    curl -O https://ftp.gnu.org/gnu/mit-scheme/stable.pkg/12.1/mit-scheme-12.1-svm1-64le.tar.gz
@@ -139,10 +138,10 @@ Scheme][mit-scheme] and [Scmutils][scmutils] working nicely on it.
 ### Integration with GNU Emacs
 
 I also happen to use [GNU Emacs][gnu-emacs], so here is some bonus
-material. If you add the following block to your Emacs configuration,
+material. If you add the following blocks to your Emacs configuration,
 they install and configure a package called [Geiser][emacs-geiser]
-that gets a nicer [REPL][wiki-repl] working in Emacs. This makes
-hacking with Scheme even more fun.
+that gets a nicer [REPL][wiki-repl] for Scheme with scmutils working
+within Emacs. This makes hacking along with this book even more fun.
 
 ````
 (use-package geiser
@@ -162,8 +161,8 @@ hacking with Scheme even more fun.
 
 ## License
 
-This tutorial is licensed under the [Creative Commons Attribution 4.0
-International License][license-cc-by].
+This learning repository is licensed under the [Creative Commons
+Attribution 4.0 International License][license-cc-by].
 
 [cm-course-susskind]: http://theoreticalminimum.com/courses/classical-mechanics/2011/fall
 [cm-course-sussman-wisdom]: https://ocw.mit.edu/courses/12-620j-classical-mechanics-a-computational-approach-fall-2008/
