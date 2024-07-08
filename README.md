@@ -1,9 +1,9 @@
 # Working Through Structure and Interpretation of Classical Mechanics
 
 This repository contains some notes on my progress through [Structure
-and Interpretation of Classical Mechanics][sicm]. This book lies at
-the intersection of things that matter very much to me: mechanics,
-mathematics and computation.
+and Interpretation of Classical Mechanics][sicm] (Second Edition).
+This book lies at the intersection of things that matter very much to
+me: mechanics, mathematics and computation.
 
 The crew behind this book (and the corresponding code) are a curious
 bunch and they have fun exploring their curiosities. They are slowly
@@ -12,18 +12,29 @@ becoming my spiritual guides.
 These are mostly notes for myself, but it's great if you want to
 follow along with:
 
-- [My experiments as I work through the book][gh-sicm-working]
+- [My console logs as I work through the book][gh-sicm-working]
 - [My solutions to the exercises in the book][gh-sicm-exercises]
+
+Feel free to [get in touch][hn-email] if you'd like to talk about this
+topic or study together.
 
 ## Background Material
 
-You can buy a physical copy of this book [at its official store
-page][sicm], or you can read [a beautiful rendition of the HTML
-version online][sicm-html]. There is also an MIT OCW course
-corresponding to it:
+There are a handful of ways you can access the book:
+
+- You can buy a physical copy of this book [at its official store
+page][sicm],
+- Read [the freely-available official HTML version][sicm-html], or
+- Read [a beautiful unofficial version][sicm-unofficial-html] online.
+
+
+There is also an MIT OCW course corresponding to it:
 
 - [Classical Mechanics: A Computational Approach by Prof. Gerald
   Sussman and Jack Wisdom][cm-course-sussman-wisdom]
+
+ The material in this course, and hence the numbering used in the
+assignments, correspond to the first edition of the book.
 
 The programming language used in this book and the accompanying
 library ([Scheme Mechanics or Scmutils][scmutils]) is called
@@ -160,13 +171,15 @@ International License][license-cc-by].
 [gh-sicm-exercises]: https://github.com/hnarayanan/sicm/tree/main/exercises
 [gh-sicm-working]: https://github.com/hnarayanan/sicm/tree/main/working
 [gnu-emacs]: https://www.gnu.org/software/emacs/
+[hn-email]: mailto:mail@harishnarayanan.org
 [license-cc-by]: https://creativecommons.org/licenses/by/4.0/
 [mit-scheme]: https://www.gnu.org/software/mit-scheme/
 [physics-course-balakrishnan]: https://www.youtube.com/playlist?list=PL5E4E56893588CBA8
 [physics-course-shankar]: https://www.youtube.com/playlist?list=PLFE3074A4CB751B2B
 [programming-course-abelson-sussman]: http://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-001-structure-and-interpretation-of-computer-programs-spring-2005/
 [scmutils]: https://groups.csail.mit.edu/mac/users/gjs/6946/installation.html
-[sicm-html]: https://tgvaughan.github.io/sicm/
+[sicm-unofficial-html]: https://tgvaughan.github.io/sicm/
+[sicm-html]: https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/9579/sicm_edition_2.zip/book.html
 [sicm]: https://mitpress.mit.edu/9780262028967/structure-and-interpretation-of-classical-mechanics/
 [sicp]: https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/index.html
 [wiki-repl]: https://en.wikipedia.org/wiki/Read–eval–print_loop
