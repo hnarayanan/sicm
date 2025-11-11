@@ -49,7 +49,7 @@ interesting:
 - [Classical Mechanics by Leonard Susskind][cm-course-susskind]
 - [Classical Physics by Venkataraman Balakrishnan][physics-course-balakrishnan]
 - [Fundamentals of Physics with Ramamurti Shankar][physics-course-shankar]
-- [Nonlinear Dynamics and Chaos by Steven Strogatz][physics-course-srogatz]
+- [Nonlinear Dynamics and Chaos by Steven Strogatz][physics-course-strogatz]
 
 ## Following Along
 
