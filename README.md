@@ -33,7 +33,7 @@ There is also an MIT OCW course corresponding to it:
   Sussman and Jack Wisdom][cm-course-sussman-wisdom]
 
 The material in this course, and hence the numbering used in the
-assignments, correspond to the first edition of the book.
+assignments, corresponds to the first edition of the book.
 
 The programming language used in this book and the accompanying
 library ([Scheme Mechanics or Scmutils][scmutils]) is called
@@ -53,7 +53,7 @@ interesting:
 
 ## Following Along
 
-### Base setup on macOS on Apple Silicon
+### Base setup for macOS on Apple Silicon
 
 I happen to work on an Apple Silicon Mac, and part of this repository
 is a collection of notes and hacks needed to get [MIT
@@ -104,7 +104,7 @@ Scheme][mit-scheme] and [Scmutils][scmutils] working nicely on it.
    ````
 
 5. The final step is to fetch and install a recent
-   [Scmutils][scmutils] (20230902 at time of writing).
+   [Scmutils][scmutils] (20230902 at the time of writing).
 
    ````
    curl -O https://groups.csail.mit.edu/mac/users/gjs/6946/mechanics-system-installation/svm/scmutils-20230902.tar.gz
@@ -122,7 +122,7 @@ Scheme][mit-scheme] and [Scmutils][scmutils] working nicely on it.
    mechanics.sh
    ````
 
-   Which greets you with the following. *Notice the modules loaded on
+   This greets you with the following: *Notice the modules loaded on
    the last line.* If you see these, it means you have it all working.
 
    ````
@@ -144,24 +144,31 @@ material.
 
 If you add the following blocks to your Emacs configuration, they
 install and configure a package called [Geiser][emacs-geiser] that
-gets a nicer [REPL][wiki-repl] for Scheme with scmutils working within
-Emacs. This makes hacking along with this book even more fun.
+provides a nicer [REPL][wiki-repl] for Scheme with scmutils working
+within Emacs. This makes hacking along with this book even more fun.
 
 ````
 (use-package geiser
   :ensure t
+  :defer t
+  :custom
+  (geiser-active-implementations '(mit))
   :config
-  (setenv "DISPLAY" ":0")
-  (setq geiser-active-implementations '(mit)))
+  (setenv "DISPLAY" ":0"))
 
 (use-package geiser-mit
   :ensure t
+  :defer t
+  :custom
+  (geiser-mit-binary "/path/to/install/scheme/bin/mit-scheme")
   :config
   (setenv "MITSCHEME_HEAP_SIZE" "100000")
-  (setenv "MITSCHEME_LIBRARY_PATH" "/path/to/install/scheme/lib/mit-scheme-svm1-64le-12.1")
   (setenv "MITSCHEME_BAND" "mechanics.com")
-  (setq geiser-mit-binary "/path/to/install/scheme/bin/mit-scheme"))
+  (setenv "MITSCHEME_LIBRARY_PATH" "/path/to/install/scheme/lib/mit-scheme-svm1-64le-12.1"))
 ````
+
+Once you've adjusted the paths and added this to your setup, running
+`M-x geiser` loads the REPL.
 
 If you are interested in more of my Emacs environment, I [share my
 entire configuration online][hn-dotemacs].
