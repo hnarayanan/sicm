@@ -32,7 +32,7 @@ There is also an MIT OCW course corresponding to it:
 - [Classical Mechanics: A Computational Approach by Prof. Gerald
   Sussman and Jack Wisdom][cm-course-sussman-wisdom]
 
- The material in this course, and hence the numbering used in the
+The material in this course, and hence the numbering used in the
 assignments, correspond to the first edition of the book.
 
 The programming language used in this book and the accompanying
@@ -63,8 +63,8 @@ Scheme][mit-scheme] and [Scmutils][scmutils] working nicely on it.
    previously, but now needs to be installed by hand. You will need
    this for graphical output.
 
-   Simply [download the installer][xquartz-installer] (2.8.5 at the time of writing) and
-   run it to install.
+   Simply [download the installer][xquartz-installer] (2.8.5 at the
+   time of writing) and run it to install.
 
 2. Fetch, unpack and patch recent source code for MIT Scheme. At the
    time of writing, this is version 12.1. For some technical reasons,
@@ -103,7 +103,8 @@ Scheme][mit-scheme] and [Scmutils][scmutils] working nicely on it.
    mit-scheme
    ````
 
-5. The final step is to fetch and install a recent Scmutils (20230902 at time of writing).
+5. The final step is to fetch and install a recent
+   [Scmutils][scmutils] (20230902 at time of writing).
 
    ````
    curl -O https://groups.csail.mit.edu/mac/users/gjs/6946/mechanics-system-installation/svm/scmutils-20230902.tar.gz
@@ -121,8 +122,8 @@ Scheme][mit-scheme] and [Scmutils][scmutils] working nicely on it.
    mechanics.sh
    ````
 
-   Which greets you with the following. Notice the modules loaded on
-   the last line. If you see these, it means you have it all working.
+   Which greets you with the following. *Notice the modules loaded on
+   the last line.* If you see these, it means you have it all working.
 
    ````
    MIT/GNU Scheme running under OS X
@@ -139,10 +140,12 @@ Scheme][mit-scheme] and [Scmutils][scmutils] working nicely on it.
 ### Integration with GNU Emacs
 
 I also happen to use [GNU Emacs][gnu-emacs], so here is some bonus
-material. If you add the following blocks to your Emacs configuration,
-they install and configure a package called [Geiser][emacs-geiser]
-that gets a nicer [REPL][wiki-repl] for Scheme with scmutils working
-within Emacs. This makes hacking along with this book even more fun.
+material.
+
+If you add the following blocks to your Emacs configuration, they
+install and configure a package called [Geiser][emacs-geiser] that
+gets a nicer [REPL][wiki-repl] for Scheme with scmutils working within
+Emacs. This makes hacking along with this book even more fun.
 
 ````
 (use-package geiser
@@ -160,6 +163,9 @@ within Emacs. This makes hacking along with this book even more fun.
   (setq geiser-mit-binary "/path/to/install/scheme/bin/mit-scheme"))
 ````
 
+If you are interested in more of my Emacs environment, I [share my
+entire configuration online][hn-dotemacs].
+
 ## License
 
 This learning repository is licensed under the [Creative Commons
@@ -171,6 +177,7 @@ Attribution 4.0 International License][license-cc-by].
 [gh-sicm-exercises]: https://github.com/hnarayanan/sicm/tree/main/exercises
 [gh-sicm-working]: https://github.com/hnarayanan/sicm/tree/main/working
 [gnu-emacs]: https://www.gnu.org/software/emacs/
+[hn-dotemacs]: https://github.com/hnarayanan/dotemacs
 [hn-email]: mailto:mail@harishnarayanan.org
 [license-cc-by]: https://creativecommons.org/licenses/by/4.0/
 [mit-scheme]: https://www.gnu.org/software/mit-scheme/
